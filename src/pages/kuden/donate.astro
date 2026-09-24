@@ -1,0 +1,49 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import Link from '@/components/Link.astro'
+import PageHead from '@/components/PageHead.astro'
+import { buttonVariants } from '@/components/ui/button'
+import Layout from '@/layouts/Layout.astro'
+
+// TODO: replace with real donation links
+const DONATE_LINKS = [
+  { label: 'Buy me a coffee', href: 'https://buymeacoffee.com/purpleshonen' },
+  { label: 'GitHub Sponsors', href: 'https://github.com/sponsors/purpleshonen' },
+]
+---
+
+<Layout class="max-w-3xl">
+  <PageHead
+    slot="head"
+    title="Support Kuden"
+    description="Support the development of the Kuden app."
+  />
+  <Breadcrumbs items={[{ label: 'Support Kuden', icon: 'lucide:heart' }]} />
+
+  <section class="prose">
+    <h1 class="mb-4 text-3xl font-medium">Support Kuden</h1>
+    <p>
+      Kuden is free, has no ads, and is built in my spare time. If it's been
+      useful to you, a donation helps cover development and hosting costs and
+      keeps the app going.
+    </p>
+    <p>Every contribution, however small, is appreciated. Thank you!</p>
+  </section>
+
+  <div class="mt-6 flex flex-wrap gap-3">
+    {
+      DONATE_LINKS.map(({ label, href }) => (
+        <Link href={href} external class={buttonVariants({ variant: 'outline' })}>
+          {label}
+        </Link>
+      ))
+    }
+  </div>
+
+  <p class="mt-8 text-sm text-muted-foreground">
+    Questions or feedback? <Link
+      href="mailto:rahul.infosec@proton.me"
+      underline>Email me</Link
+    >.
+  </p>
+</Layout>

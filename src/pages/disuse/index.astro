@@ -1,0 +1,49 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import Link from '@/components/Link.astro'
+import PageHead from '@/components/PageHead.astro'
+import { buttonVariants } from '@/components/ui/button'
+import Layout from '@/layouts/Layout.astro'
+---
+
+<Layout class="max-w-3xl">
+  <PageHead
+    slot="head"
+    title="Disuse"
+    description="Disuse, a free Android app for learning by recall, made by PurpleShonen."
+  />
+  <Breadcrumbs items={[{ label: 'Disuse', icon: 'lucide:smartphone' }]} />
+
+  <section class="prose">
+    <h1 class="mb-4 text-3xl font-medium">Disuse</h1>
+    <p>
+      Disuse is a free Android app for learning by recall. You write questions,
+      answer each one from memory before the answer is shown, and it brings a
+      question back just as you are about to forget it. It is named for Bjork
+      and Bjork's New Theory of Disuse.
+    </p>
+    <p>
+      There is no account, no ads and no tracking. Everything stays on your
+      phone, except a page you choose to scan, which goes to Google's Gemini
+      with your own free API key.
+    </p>
+    <p>Coming soon to Google Play. For adults, 18 and over.</p>
+    <h2>Who makes it</h2>
+    <p>
+      Disuse is made by PurpleShonen, a sole proprietorship of Rahul Joriya in
+      Jodhpur, Rajasthan, India.
+    </p>
+  </section>
+
+  <div class="mt-6 flex flex-wrap gap-3">
+    <Link href="/disuse/privacy" class={buttonVariants({ variant: 'outline' })}>
+      Privacy policy
+    </Link>
+    <Link
+      href="mailto:rahul0x.work@outlook.com"
+      class={buttonVariants({ variant: 'outline' })}
+    >
+      Contact
+    </Link>
+  </div>
+</Layout>

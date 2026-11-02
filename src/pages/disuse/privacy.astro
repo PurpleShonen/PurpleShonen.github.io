@@ -1,0 +1,24 @@
+---
+import Breadcrumbs from '@/components/Breadcrumbs.astro'
+import PageHead from '@/components/PageHead.astro'
+import Layout from '@/layouts/Layout.astro'
+import { Content } from '@/data/disuse-privacy.md'
+---
+
+<Layout class="max-w-3xl">
+  <PageHead
+    slot="head"
+    title="Disuse privacy policy"
+    description="What the Disuse app stores, what leaves the phone, and why."
+  />
+  <Breadcrumbs
+    items={[
+      { href: '/disuse', label: 'Disuse', icon: 'lucide:smartphone' },
+      { label: 'Privacy policy', icon: 'lucide:shield' },
+    ]}
+  />
+
+  <article class="prose">
+    <Content />
+  </article>
+</Layout>

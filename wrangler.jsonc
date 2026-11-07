@@ -1,0 +1,10 @@
+{
+  // Cloudflare Workers static-asset deploy of the Astro build output.
+  "name": "purpleshonen",
+  "compatibility_date": "2026-11-01",
+  "assets": {
+    "directory": "./dist",
+    "not_found_handling": "404-page",
+    "html_handling": "auto-trailing-slash"
+  }
+}

@@ -21,7 +21,7 @@ const { link, image, name, description, startDate, endDate, tags } =
 >
   {
     image && (
-      <div class="bg-muted hidden aspect-[1200/630] w-full self-start overflow-hidden rounded-[4px] sm:block">
+      <div class="bg-muted ring-border aspect-[1200/630] w-full self-start overflow-hidden rounded-[4px] ring-1">
         {typeof image === 'string' ? (
           <img
             src={image}

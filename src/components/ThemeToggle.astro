@@ -20,8 +20,8 @@ import { Icon } from 'astro-icon/components'
     const theme = (() => {
       const stored = localStorage?.getItem('theme') ?? ''
       if (['dark', 'light'].includes(stored)) return stored
-      // Dark is the default; light only when the visitor chose it.
-      return 'dark'
+      // Light is the default; dark only when the visitor chose it.
+      return 'light'
     })()
 
     document.documentElement.setAttribute('data-theme', theme)
@@ -69,7 +69,7 @@ import { Icon } from 'astro-icon/components'
   initThemeToggle()
 
   document.addEventListener('astro:after-swap', () => {
-    const storedTheme = localStorage.getItem('theme') || 'dark'
+    const storedTheme = localStorage.getItem('theme') || 'light'
     const element = document.documentElement
 
     element.classList.add('[&_*]:transition-none')

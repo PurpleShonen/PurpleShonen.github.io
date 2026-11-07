@@ -34,7 +34,7 @@ Static Astro site deployed on Cloudflare Workers from `main`. Content is edited 
 
 - Name: PurpleShonen.
 - Purple color identity (#800080 and lavender #e6e6fa) stays a core brand color.
-- Dark mode is the default theme; light mode remains available.
+- Light mode is the default theme; dark mode remains available from the toggle.
 - The homepage opens with the dictionary-style definition: "SOC An·a·lyst /pronunciation/ noun".
 
 ## Evidence on Hand

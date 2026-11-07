@@ -1,8 +1,8 @@
 ---
 name: PurpleShonen
-pronouns: SOC Analyst
+pronouns: Aspiring SOC Analyst
 avatar: logo.jpg
-bio: SOC Analyst, blue teamer, and YouTuber.
+bio: Aspiring SOC Analyst, blue teamer, and YouTuber.
 website: https://purpleshonen.fyi
 mastodon: https://infosec.exchange/@purpleshonen
 github: https://github.com/purpleshonen

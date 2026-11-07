@@ -1,0 +1,305 @@
+---
+// PGP public key panel: fingerprint first, live fingerprint verification,
+// copy-ready gpg commands, and the full armored key on demand.
+// Facts below come from `gpg --show-keys` on the published .asc file.
+import { Icon } from 'astro-icon/components'
+import publicKey from '../../public/downloadables/purpleshonen-publickey.asc?raw'
+
+const FINGERPRINT = '6B75FB142C45756BDDE6D6B71D3F2451BEAA03FF'
+const SUBKEY = '35AAAA55A736EF9D4573096BF172C4D67AA0F297'
+const EMAIL = 'rahul.infosec@proton.me'
+const KEY_URL = 'https://purpleshonen.fyi/downloadables/purpleshonen-publickey.asc'
+
+const groups = FINGERPRINT.match(/.{4}/g) ?? []
+const fmt = (fp: string) => (fp.match(/.{4}/g) ?? []).join(' ')
+
+const commands = [
+  { label: 'Import', cmd: `curl -sL ${KEY_URL} | gpg --import` },
+  { label: 'Check', cmd: `gpg --fingerprint ${EMAIL}` },
+]
+
+const details = [
+  { term: 'User ID', value: EMAIL },
+  { term: 'Primary key', value: 'Ed25519 · sign, certify' },
+  { term: 'Encryption subkey', value: 'Curve25519 (cv25519)', mono: fmt(SUBKEY) },
+  { term: 'Created', value: 'June 28, 2025 · no expiry set' },
+]
+
+const btn =
+  'group inline-flex cursor-pointer items-center gap-1.5 text-sm transition-colors'
+---
+
+<section class="mt-14" aria-labelledby="pgp-title" data-pgp>
+  <div
+    class="mb-6 flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b pb-3"
+    data-reveal
+  >
+    <h2 id="pgp-title" class="text-xl font-semibold">PGP public key</h2>
+    <span class="text-muted-foreground text-sm">
+      Ed25519 &middot; for private reports and encrypted mail
+    </span>
+  </div>
+
+  <div class="rounded-lg border" data-reveal>
+    <!-- Fingerprint -->
+    <div class="p-5 sm:p-7">
+      <div class="flex items-center justify-between gap-4">
+        <p class="text-muted-foreground text-sm">Fingerprint</p>
+        <button
+          type="button"
+          class:list={[btn, 'text-muted-foreground hover:text-accent']}
+          data-copy={FINGERPRINT}
+          data-copy-label="Copy fingerprint"
+        >
+          <Icon name="lucide:copy" class="size-3.5" data-icon-idle />
+          <Icon name="lucide:check" class="hidden size-3.5" data-icon-done />
+          <span data-label>Copy fingerprint</span>
+        </button>
+      </div>
+
+      <ol
+        class="mt-4 grid grid-cols-5 gap-x-3 gap-y-3 font-mono text-lg tracking-wider sm:gap-x-5 sm:text-2xl"
+        aria-label={`Fingerprint ${fmt(FINGERPRINT)}`}
+      >
+        {
+          groups.map((g, i) => (
+            <li
+              data-reveal
+              data-fp-group={i}
+              class:list={[
+                'pgp-group rounded-[3px] px-1 py-0.5 text-center transition-colors duration-300',
+                i >= 6 ? 'text-foreground' : 'text-muted-foreground',
+              ]}
+            >
+              {g}
+            </li>
+          ))
+        }
+      </ol>
+      <p class="text-muted-foreground mt-4 text-xs">
+        Long key ID <span class="text-foreground font-mono"
+          >{groups.slice(6).join(' ')}</span
+        > — the last 16 characters, highlighted above.
+      </p>
+    </div>
+
+    <!-- Verify -->
+    <div class="bg-muted/40 border-t p-5 sm:px-7">
+      <label for="pgp-verify" class="text-sm font-medium">
+        Verify the key you have
+      </label>
+      <p class="text-muted-foreground mt-1 text-sm">
+        Paste the fingerprint gpg shows you. Each group lights up as it matches.
+      </p>
+      <div class="mt-3 flex flex-col gap-2 sm:flex-row sm:items-center">
+        <input
+          id="pgp-verify"
+          type="text"
+          inputmode="text"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="6B75 FB14 2C45 …"
+          class="bg-background focus-visible:ring-ring/50 w-full rounded-[4px] border px-3 py-2 font-mono text-sm tracking-wide outline-none focus-visible:ring-[3px] sm:max-w-sm"
+          data-verify-input
+        />
+        <p
+          class="text-muted-foreground min-h-5 text-sm"
+          role="status"
+          aria-live="polite"
+          data-verify-status
+        >
+        </p>
+      </div>
+    </div>
+
+    <!-- Commands -->
+    <div class="border-t p-5 sm:px-7">
+      <p class="text-sm font-medium">Import and check with gpg</p>
+      <ul class="mt-3 flex flex-col gap-2" role="list">
+        {
+          commands.map(({ label, cmd }) => (
+            <li class="bg-muted/60 flex items-center gap-3 rounded-[4px] py-2 pr-2 pl-3">
+              <span class="text-muted-foreground hidden w-12 shrink-0 text-xs sm:block">
+                {label}
+              </span>
+              <code class="min-w-0 flex-1 font-mono text-[0.8rem] leading-relaxed break-all">
+                {cmd}
+              </code>
+              <button
+                type="button"
+                class="text-muted-foreground hover:text-accent hover:bg-background grid size-8 shrink-0 cursor-pointer place-items-center rounded-[4px] transition-colors"
+                data-copy={cmd}
+                aria-label={`Copy ${label.toLowerCase()} command`}
+              >
+                <Icon name="lucide:copy" class="size-3.5" data-icon-idle />
+                <Icon name="lucide:check" class="hidden size-3.5" data-icon-done />
+              </button>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+
+    <!-- Details -->
+    <dl class="grid gap-x-8 gap-y-3 border-t p-5 text-sm sm:grid-cols-[10rem_minmax(0,1fr)] sm:px-7">
+      {
+        details.map(({ term, value, mono }) => (
+          <>
+            <dt class="text-muted-foreground">{term}</dt>
+            <dd>
+              {value}
+              {mono && (
+                <span class="text-muted-foreground mt-0.5 block font-mono text-xs tracking-wide">
+                  {mono}
+                </span>
+              )}
+            </dd>
+          </>
+        ))
+      }
+    </dl>
+
+    <!-- Full key + actions -->
+    <div class="border-t p-5 sm:px-7">
+      <details class="group/key">
+        <summary
+          class="text-muted-foreground hover:text-accent inline-flex cursor-pointer list-none items-center gap-1.5 text-sm transition-colors [&::-webkit-details-marker]:hidden"
+        >
+          Show full armored key
+          <Icon
+            name="lucide:chevron-down"
+            class="size-4 transition-transform group-open/key:rotate-180"
+          />
+        </summary>
+        <pre
+          class="bg-muted text-muted-foreground mt-4 max-h-80 overflow-auto rounded-[4px] p-4 font-mono text-xs leading-relaxed"
+          data-pgp-armor>{publicKey.trim()}</pre>
+      </details>
+
+      <div class="mt-5 flex flex-wrap items-center gap-x-6 gap-y-3">
+        <button
+          type="button"
+          class:list={[btn, 'link-sweep text-foreground hover:text-accent font-semibold']}
+          data-copy-from="[data-pgp-armor]"
+          data-copy-label="Copy key"
+        >
+          <Icon name="lucide:copy" class="size-3.5" data-icon-idle />
+          <Icon name="lucide:check" class="hidden size-3.5" data-icon-done />
+          <span data-label>Copy key</span>
+        </button>
+        <a
+          href="/downloadables/purpleshonen-publickey.asc"
+          download="purpleshonen-publickey.asc"
+          class="group link-sweep text-muted-foreground hover:text-accent inline-flex items-center gap-1 text-sm"
+        >
+          Download .asc
+          <Icon
+            name="lucide:arrow-down"
+            class="size-3.5 opacity-60 transition-[opacity,translate] group-hover:translate-y-0.5 group-hover:opacity-100"
+          />
+        </a>
+        <a
+          href={`mailto:${EMAIL}`}
+          class="group link-sweep text-muted-foreground hover:text-accent inline-flex items-center gap-1 text-sm"
+        >
+          Email me
+          <Icon
+            name="lucide:arrow-up-right"
+            class="size-3.5 opacity-60 transition-[opacity,translate] group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100"
+          />
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .pgp-group[data-state='match'] {
+    color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+
+  .pgp-group[data-state='mismatch'] {
+    color: var(--destructive);
+    background: color-mix(in srgb, var(--destructive) 12%, transparent);
+    text-decoration: line-through;
+  }
+</style>
+
+<script>
+  const FINGERPRINT = '6B75FB142C45756BDDE6D6B71D3F2451BEAA03FF'
+
+  function flash(btn: HTMLElement, text: string) {
+    const label = btn.querySelector('[data-label]')
+    const idle = btn.querySelector('[data-icon-idle]')
+    const done = btn.querySelector('[data-icon-done]')
+    const original = btn.dataset.copyLabel ?? label?.textContent ?? ''
+    if (label) label.textContent = text
+    idle?.classList.add('hidden')
+    done?.classList.remove('hidden')
+    setTimeout(() => {
+      if (label) label.textContent = original
+      idle?.classList.remove('hidden')
+      done?.classList.add('hidden')
+    }, 1800)
+  }
+
+  function initPgp() {
+    const root = document.querySelector<HTMLElement>('[data-pgp]')
+    if (!root || root.dataset.ready === 'true') return
+    root.dataset.ready = 'true'
+
+    root.querySelectorAll<HTMLButtonElement>('[data-copy], [data-copy-from]').forEach((btn) => {
+      btn.addEventListener('click', async () => {
+        const from = btn.dataset.copyFrom
+        const text = from
+          ? (document.querySelector(from)?.textContent ?? '')
+          : (btn.dataset.copy ?? '')
+        try {
+          await navigator.clipboard.writeText(text)
+          flash(btn, 'Copied')
+        } catch {
+          flash(btn, 'Copy failed')
+        }
+      })
+    })
+
+    const input = root.querySelector<HTMLInputElement>('[data-verify-input]')
+    const status = root.querySelector<HTMLElement>('[data-verify-status]')
+    const cells = [...root.querySelectorAll<HTMLElement>('[data-fp-group]')]
+    if (!input || !status) return
+
+    input.addEventListener('input', () => {
+      const typed = input.value.toUpperCase().replace(/[^0-9A-F]/g, '')
+      let mismatch = false
+
+      cells.forEach((cell, i) => {
+        const want = FINGERPRINT.slice(i * 4, i * 4 + 4)
+        const got = typed.slice(i * 4, i * 4 + 4)
+        if (!got) delete cell.dataset.state
+        else if (got.length < 4 && want.startsWith(got)) delete cell.dataset.state
+        else if (got === want) cell.dataset.state = 'match'
+        else {
+          cell.dataset.state = 'mismatch'
+          mismatch = true
+        }
+      })
+
+      if (!typed) {
+        status.textContent = ''
+        status.style.color = ''
+      } else if (mismatch || typed.length > FINGERPRINT.length) {
+        status.textContent = 'Doesn’t match — don’t trust that key.'
+        status.style.color = 'var(--destructive)'
+      } else if (typed === FINGERPRINT) {
+        status.textContent = 'Full match — this is my key.'
+        status.style.color = 'var(--accent)'
+      } else {
+        status.textContent = `${typed.length} of 40 characters match so far…`
+        status.style.color = ''
+      }
+    })
+  }
+
+  document.addEventListener('astro:page-load', initPgp)
+</script>

@@ -3,7 +3,7 @@ import Breadcrumbs from '@/components/Breadcrumbs.astro'
 import PageHead from '@/components/PageHead.astro'
 import Layout from '@/layouts/Layout.astro'
 import { Icon } from 'astro-icon/components'
-import publicKey from '../../public/downloadables/purpleshonen-publickey.asc?raw'
+import PgpKey from '@/components/PgpKey.astro'
 
 import yamlData from '../data/certifications.yml'
 
@@ -22,8 +22,6 @@ const profiles = [
   { href: 'https://ctftime.org/user/245301', label: 'CTFtime' },
 ]
 
-const FINGERPRINT = '6B75FB142C45756BDDE6D6B71D3F2451BEAA03FF'
-const fingerprintGroups = FINGERPRINT.match(/.{1,4}/g) ?? []
 
 const linkClass =
   'group link-sweep text-muted-foreground hover:text-accent inline-flex items-center gap-1'
@@ -171,70 +169,7 @@ const iconClass =
     </div>
   </section>
 
-  <section class="mt-14" data-reveal>
-    <div class="mb-6 border-b pb-3">
-      <h2 class="text-xl font-semibold">PGP public key</h2>
-    </div>
-
-    <dl class="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-[8rem_minmax(0,1fr)]">
-      <dt class="text-muted-foreground">Fingerprint</dt>
-      <dd class="font-mono text-[0.95rem] tracking-wide">
-        {
-          fingerprintGroups.map((g, i) => (
-            <span class:list={[i === 5 && 'sm:ml-3']}>{g} </span>
-          ))
-        }
-      </dd>
-      <dt class="text-muted-foreground">User ID</dt>
-      <dd>rahul.infosec@proton.me</dd>
-      <dt class="text-muted-foreground">Type</dt>
-      <dd>255-bit EdDSA · signing, encryption, certification</dd>
-      <dt class="text-muted-foreground">Valid from</dt>
-      <dd>June 28, 2025</dd>
-    </dl>
-
-    <details class="group/key mt-6">
-      <summary
-        class="text-muted-foreground hover:text-accent inline-flex cursor-pointer list-none items-center gap-1.5 text-sm transition-colors [&::-webkit-details-marker]:hidden"
-      >
-        Show full key
-        <Icon
-          name="lucide:chevron-down"
-          class="size-4 transition-transform duration-300 group-open/key:rotate-180"
-        />
-      </summary>
-      <pre
-        class="bg-muted text-muted-foreground mt-4 max-h-80 overflow-auto rounded-md p-4 font-mono text-xs leading-relaxed"
-        data-pgp-key>{publicKey.trim()}</pre>
-    </details>
-
-    <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-[0.95rem]">
-      <button
-        type="button"
-        class="group link-sweep text-foreground hover:text-accent inline-flex cursor-pointer items-center gap-1.5 font-semibold"
-        data-copy-key
-      >
-        <Icon name="lucide:copy" class="size-3.5" data-icon-copy />
-        <Icon name="lucide:check" class="hidden size-3.5" data-icon-done />
-        <span data-copy-label>Copy key</span>
-      </button>
-      <a
-        href="/downloadables/purpleshonen-publickey.asc"
-        download="purpleshonen-publickey.asc"
-        class={linkClass}
-      >
-        Download .asc
-        <Icon
-          name="lucide:arrow-down"
-          class="size-3.5 opacity-60 transition-[opacity,translate] duration-300 group-hover:translate-y-0.5 group-hover:opacity-100"
-        />
-      </a>
-      <a href="mailto:rahul.infosec@proton.me" class={linkClass}>
-        Email me
-        <Icon name="lucide:arrow-up-right" class={iconClass} />
-      </a>
-    </div>
-  </section>
+  <PgpKey />
 
   <script>
     const initAbout = () => {
@@ -253,30 +188,6 @@ const iconClass =
             label.textContent = open
               ? 'Hide certificate scans'
               : 'Show certificate scans'
-        })
-      }
-
-      const copy = document.querySelector<HTMLButtonElement>('[data-copy-key]')
-      const key = document.querySelector('[data-pgp-key]')
-      if (copy && key && copy.dataset.initialized !== 'true') {
-        copy.dataset.initialized = 'true'
-        const label = copy.querySelector('[data-copy-label]')
-        const iconCopy = copy.querySelector('[data-icon-copy]')
-        const iconDone = copy.querySelector('[data-icon-done]')
-        copy.addEventListener('click', async () => {
-          try {
-            await navigator.clipboard.writeText(key.textContent ?? '')
-            if (label) label.textContent = 'Copied'
-            iconCopy?.classList.add('hidden')
-            iconDone?.classList.remove('hidden')
-            setTimeout(() => {
-              if (label) label.textContent = 'Copy key'
-              iconCopy?.classList.remove('hidden')
-              iconDone?.classList.add('hidden')
-            }, 2000)
-          } catch {
-            if (label) label.textContent = 'Copy failed — use Download .asc'
-          }
         })
       }
     }

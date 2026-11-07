@@ -3,9 +3,9 @@
 
 # Privacy policy — Disuse
 
-**Last updated: 2 November 2026**
+**Last updated: 7 November 2026**
 
-**Applies to: Disuse for Android, version 0.13.1 and later**
+**Applies to: Disuse for Android, version 0.14.1 and later**
 
 ## The short version
 
@@ -95,6 +95,12 @@ These open your own email app with a message already written. Nothing is
 sent unless you tap send there. The message contains the app version, the
 device model and Android version, and for a crash, the error and where in the
 code it happened. Never your questions, answers, recordings or subjects.
+
+**Report a suggestion**, under Scan's results, works the same way, and its
+message also carries the suggestion you are reporting (the topic, the
+question and the answer as Scan wrote them), because that is what the report
+is about. Not the photo, and nothing else from your library. You see it in
+your email app before anything is sent, and can cut it there.
 
 There is nothing else: no tracking, no advertising ID, no analytics, no
 crash-reporting service.

@@ -2,6 +2,10 @@ import { glob } from 'astro/loaders'
 import { defineCollection } from 'astro:content'
 import { z } from 'astro/zod'
 
+// The CMS writes an empty string when an optional date is left blank; treat that as "no date".
+const optionalDate = () =>
+  z.preprocess((arg) => (typeof arg === 'string' && arg.trim() === '' ? undefined : arg), z.coerce.date().optional())
+
 const blog = defineCollection({
   loader: glob({ pattern: '**/*.{md,mdx}', base: './src/content/blog' }),
   schema: ({ image }) =>
@@ -43,8 +47,8 @@ const projects = defineCollection({
       tags: z.array(z.string()),
       image: z.string().refine((s) => s.startsWith('/') || s.startsWith('http')).or(image()),
       link: z.string().optional(),
-      startDate: z.coerce.date().optional(),
-      endDate: z.preprocess((arg) => (typeof arg === 'string' && arg === '' ? undefined : arg), z.coerce.date().optional()),
+      startDate: optionalDate(),
+      endDate: optionalDate(),
     }),
 })
 

@@ -3,7 +3,7 @@ import type { IconMap, SocialLink, Site } from '@/types'
 export const SITE: Site = {
   title: 'PurpleShonen',
   description:
-    'An autodidact programmer and hacker, focused on cybersecurity learning and community building.',
+    'SOC analyst focused on detection, incident response, and security operations — writeups, projects, and notes from the blue team.',
   href: 'https://purpleshonen.fyi',
   author: 'purpleshonen',
   locale: 'en-US',

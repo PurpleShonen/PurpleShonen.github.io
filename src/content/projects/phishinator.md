@@ -7,5 +7,6 @@ tags:
   - PythonDevelopment
 image: ./image.jpg
 link: https://github.com/PurpleShonen/Phishinator
-endDate: 2026-11-07T12:33:00
+startDate: 2026-11-01T00:00:00.000+05:30
+endDate: 2026-11-07T12:33:00.000+05:30
 ---

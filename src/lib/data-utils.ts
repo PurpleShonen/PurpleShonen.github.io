@@ -24,8 +24,9 @@ export async function getAllPostsAndSubposts(): Promise<
 export async function getAllProjects(): Promise<CollectionEntry<'projects'>[]> {
   const projects = await getCollection('projects')
   return projects.sort((a, b) => {
-    const dateA = a.data.startDate?.getTime() || 0
-    const dateB = b.data.startDate?.getTime() || 0
+    // Newest first; fall back to endDate so a project missing a start date isn't pushed to the bottom.
+    const dateA = (a.data.startDate ?? a.data.endDate)?.getTime() || 0
+    const dateB = (b.data.startDate ?? b.data.endDate)?.getTime() || 0
     return dateB - dateA
   })
 }

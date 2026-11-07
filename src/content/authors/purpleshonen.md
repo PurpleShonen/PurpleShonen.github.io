@@ -1,8 +1,8 @@
 ---
 name: PurpleShonen
-pronouns: Cybersecurity Intern
+pronouns: SOC Analyst
 avatar: logo.jpg
-bio: An autodidact Programmer, Hacker, and YouTuber.
+bio: SOC Analyst, blue teamer, and YouTuber.
 website: https://purpleshonen.fyi
 mastodon: https://infosec.exchange/@purpleshonen
 github: https://github.com/purpleshonen

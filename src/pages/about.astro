@@ -1,242 +1,286 @@
 ---
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
 import Layout from '@/layouts/Layout.astro'
-import { buttonVariants } from '@/components/ui/button'
+import { Icon } from 'astro-icon/components'
+import publicKey from '../../public/downloadables/purpleshonen-publickey.asc?raw'
 
 import yamlData from '../data/certifications.yml'
 
 interface Certificate {
-  name: string;
-  image: string | { src: string };
-  alt: string;
-  caption: string;
+  name: string
+  image: string | { src: string }
+  alt: string
+  caption: string
 }
 
-const sortedCerts = (yamlData as any).certifications as Certificate[];
+const sortedCerts = (yamlData as any).certifications as Certificate[]
+
+const profiles = [
+  { href: 'https://www.credly.com/users/rahuljoriya', label: 'Credly' },
+  { href: 'https://tryhackme.com/p/PurpleShonen', label: 'TryHackMe' },
+  { href: 'https://ctftime.org/user/245301', label: 'CTFtime' },
+]
+
+const FINGERPRINT = '6B75FB142C45756BDDE6D6B71D3F2451BEAA03FF'
+const fingerprintGroups = FINGERPRINT.match(/.{1,4}/g) ?? []
+
+const linkClass =
+  'group link-sweep text-muted-foreground hover:text-accent inline-flex items-center gap-1'
+const iconClass =
+  'size-3.5 opacity-60 transition-[opacity,translate] duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:opacity-100'
 ---
 
 <Layout class="max-w-3xl">
   <PageHead slot="head" title="About" />
   <Breadcrumbs items={[{ label: 'About', icon: 'lucide:info' }]} />
 
-   <section>
-    <div class="min-w-full">
-      {/* only the text stays in prose */}
-      <div class="prose mb-6">
-        <h1 class="mb-4 text-3xl font-medium sm:text-4xl">About</h1>
-        <p>
-          An aspiring SOC analyst focused on security operations — monitoring,
-          alert triage, incident investigation, and making sense of what the logs
-          are really saying. I use this place to publish investigation writeups,
-          document projects, and share notes from my hands-on blue team learning.
-        </p>
+  <section>
+    <h1
+      data-headword
+      class="mt-4 mb-8 text-4xl font-semibold tracking-[-0.03em] sm:text-6xl"
+    >
+      About
+    </h1>
 
-        <p>
-          My focus areas include SIEM and log analysis, network traffic analysis,
-          phishing and email investigation, threat intelligence, Linux, and Python
-          automation for security workflows. Most of what I learn is distilled into
-          clear walkthroughs and tools that others can experiment with themselves.
-        </p>
+    <div class="prose" data-intro>
+      <p>
+        An aspiring SOC analyst focused on security operations — monitoring,
+        alert triage, incident investigation, and making sense of what the logs
+        are really saying. I use this place to publish investigation writeups,
+        document projects, and share notes from my hands-on blue team learning.
+      </p>
 
-        <p>
-          I also share tutorials and demonstrations on <Link
-            href="https://www.youtube.com/@purpleshonen"
-            external
-            underline
-          >YouTube</Link>, where I break down cybersecurity concepts into practical,
-          beginner-friendly lessons.
-        </p>
+      <p>
+        My focus areas include SIEM and log analysis, network traffic analysis,
+        phishing and email investigation, threat intelligence, Linux, and Python
+        automation for security workflows. Most of what I learn is distilled
+        into clear walkthroughs and tools that others can experiment with
+        themselves.
+      </p>
 
-        <p>
-          You can follow my certifications and hands-on lab progress across the
-          platforms below:
-        </p>
+      <p>
+        I also share tutorials and demonstrations on <a
+          href="https://www.youtube.com/@purpleshonen"
+          target="_blank"
+          rel="noopener">YouTube</a
+        >, where I break down cybersecurity concepts into practical,
+        beginner-friendly lessons.
+      </p>
 
-        {/* profiles list */}
-        <ul class="list-disc list-inside space-y-1 text-left">
+      <p>
+        You can follow my certifications and hands-on lab progress across the
+        platforms below:
+      </p>
+    </div>
+
+    <ul class="mt-4 mb-8 flex flex-wrap gap-x-6 gap-y-2" role="list">
+      {
+        profiles.map((p) => (
           <li>
-            <a
-              href="https://www.credly.com/users/rahuljoriya"
-              target="_blank"
-              rel="noreferrer"
-              class="text-foreground underline-offset-4 hover:underline"
-            >
-              Credly – Certifications Profile
+            <a href={p.href} target="_blank" rel="noopener" class={linkClass}>
+              {p.label}
+              <Icon name="lucide:arrow-up-right" class={iconClass} />
             </a>
           </li>
-          <li>
-            <a
-              href="https://tryhackme.com/p/PurpleShonen"
-              target="_blank"
-              rel="noreferrer"
-              class="text-foreground underline-offset-4 hover:underline"
-            >
-              TryHackMe – PurpleShonen
-            </a>
-          </li>
-          <li>
-            <a
-              href="https://ctftime.org/user/245301"
-              target="_blank"
-              rel="noreferrer"
-              class="text-foreground underline-offset-4 hover:underline"
-            >
-              CTFtime – PurpleShonen
-            </a>
-          </li>
-        </ul>
+        ))
+      }
+    </ul>
 
-        <p>
-          This site serves as a growing knowledge log — everything shared here is
-          something I’ve tested, practiced, or actively studied.
-        </p>
+    <div class="prose">
+      <p>
+        This site serves as a growing knowledge log — everything shared here is
+        something I’ve tested, practiced, or actively studied.
+      </p>
 
-        <p>
-          PurpleShonen is also my business: a sole proprietorship of Rahul
-          Joriya, based in Jodhpur, India, which develops and publishes apps.
-        </p>
-      </div>
-
-      {/* Credly Badges Grid */}
-      <div class="my-8 grid grid-cols-2 md:grid-cols-3 gap-4 justify-items-center">
-        {/* CompTIA Security+ */}
-        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="ea6b048a-927e-47c6-9e13-f0c13e506a8b" data-share-badge-host="https://www.credly.com"></div>
-        {/* CS50 */}
-        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="b0aa8684-9d09-47c6-8bc7-9a05c229ac54" data-share-badge-host="https://www.credly.com"></div>
-        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="6d904561-a859-4e35-a077-419ffd6d6d33" data-share-badge-host="https://www.credly.com"></div>
-        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="5922f724-9782-4e06-982f-4a794db44b46" data-share-badge-host="https://www.credly.com"></div>
-        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="fe751831-6719-49a6-8f2c-4b0bb48d5ba3" data-share-badge-host="https://www.credly.com"></div>
-        <div data-iframe-width="150" data-iframe-height="270" data-share-badge-id="3e7e48e1-ba0e-4054-ae13-0a4fdd646dd2" data-share-badge-host="https://www.credly.com"></div>
-        <script type="text/javascript" async is:inline src="//cdn.credly.com/assets/utilities/embed.js"></script>
-      </div>
-
-
-      {/* buttons under the text, left aligned */}
-      <div class="mt-4 flex flex-wrap gap-3 justify-start">
-        <Link
-          href="../resume.pdf"
-          class={buttonVariants({ variant: 'outline' })}
-        >
-          Download résumé
-        </Link>
-
-        <button
-          type="button"
-          class={buttonVariants({ variant: 'ghost' })}
-          data-toggle-certificates
-        >
-          Show certifications &amp; profiles
-        </button>
-      </div>
-
-      {/* links + badges panel, all left-aligned */}
-      <div
-        id="certificates"
-        class="mt-6 space-y-4 rounded-lg border p-4 text-sm text-muted-foreground hidden"
-      >
-
-        {/* Certifications */}
-        <div class="space-y-2 text-left">
-          <p class="text-foreground font-medium">
-            Certifications
-          </p>
-          {sortedCerts.map((cert) => (
-            <>
-              <img
-                src={typeof cert.image === 'string' ? cert.image : cert.image.src}
-                alt={cert.alt}
-                class="w-full h-auto max-w-full rounded-md object-contain border"
-                loading="lazy"
-              />
-              <p class="italic text-xs">
-                 {cert.caption}
-              </p>
-            </>
-          ))}
-
-        </div>
-        
-      </div>
-
-      <h2 class="mb-4 mt-8 text-2xl font-medium">PGP Public Key</h2>
-      <div class="bg-muted p-4 rounded-md text-xs font-mono whitespace-pre-wrap break-all text-muted-foreground leading-relaxed">
-            -----BEGIN PGP PUBLIC KEY BLOCK----- <br>
-            Comment: User ID:	rahul.infosec@proton.me &lt;rahul.infosec@proton.me&gt; <br>
-            Comment: Valid from:	6/28/2025 11:46 AM <br>
-            Comment: Type:	255-bit EdDSA <br>
-            Comment: Usage:	Signing, Encryption, Certifying User IDs <br>
-            Comment: Fingerprint:	6B75FB142C45756BDDE6D6B71D3F2451BEAA03FF <br> <br>
-
-
-            mDMEaF+IqxYJKwYBBAHaRw8BAQdADoTn82VvBjMqKz95rBxSkDnNfsGo4tXohIJb
-            0yEgp2y0MXJhaHVsLmluZm9zZWNAcHJvdG9uLm1lIDxyYWh1bC5pbmZvc2VjQHBy
-            b3Rvbi5tZT6I0QQTFgoAgwWCaF+IqwMLCQcJkB0/JFG+qgP/RRQAAAAAABwAIHNh
-            bHRAbm90YXRpb25zLm9wZW5wZ3Bqcy5vcmdPmZxB+lkwCo4me7n2nTbWNFF6zrWd
-            x6A4UruqQXsF/QMVCggEFgACAQIZAQKbAwIeARYhBGt1+xQsRXVr3ebWtx0/JFG+
-            qgP/AAC8sQEA0/8ruEXPE89jXKBz18jX6WtyEg+kUGvE1AfWQavoORUBANOepOGb
-            Y5VMBwBKyNq9+A8frzwfODEYzcQXUxagBzELuDgEaF+IqxIKKwYBBAGXVQEFAQEH
-            QB+AHxFsZ+PjwXalNvuO+ZbayIh9AGM03rT/okqeh9p4AwEIB4i+BBgWCgBwBYJo
-            X4irCZAdPyRRvqoD/0UUAAAAAAAcACBzYWx0QG5vdGF0aW9ucy5vcGVucGdwanMu
-            b3JnRw95lt7nm4lLA6LZYECKepEm5wNH20GkebL5ED8zj2cCmwwWIQRrdfsULEV1
-            a93m1rcdPyRRvqoD/wAACQcA/0aikxmLIW1y9Di0lpvQEnkj1jd7P7BrHmlTxKnB
-            cJ1qAQDdgbdmQ7R5UQqp9zbB6rzKn3xiiDaHYvKiam7zXZ0JDw==
-            =lxN6 <br>
-            -----END PGP PUBLIC KEY BLOCK-----
-      </div>
-      <div class="mt-4 flex flex-wrap gap-3">
-        <Link
-          href="/downloadables/purpleshonen-publickey.asc"
-          class={buttonVariants({ variant: 'outline' })}
-          download="purpleshonen-publickey.asc"
-        >
-          Download ASC
-        </Link>
-        <Link
-          href="mailto:rahul.infosec@proton.me"
-          class={buttonVariants({ variant: 'ghost' })}
-        >
-          Email Me
-        </Link>
-      </div>
+      <p>
+        PurpleShonen is also my business: a sole proprietorship of Rahul
+        Joriya, based in Jodhpur, India, which develops and publishes apps.
+      </p>
     </div>
   </section>
 
+  <section class="mt-14" data-reveal>
+    <div class="mb-6 flex items-baseline justify-between gap-4 border-b pb-3">
+      <h2 class="text-xl font-semibold">Certifications</h2>
+      <a
+        href="https://www.credly.com/users/rahuljoriya"
+        target="_blank"
+        rel="noopener"
+        class={linkClass + ' text-sm'}
+      >
+        Verify on Credly
+        <Icon name="lucide:arrow-up-right" class={iconClass} />
+      </a>
+    </div>
 
-<script>
-  const initCertificatesToggle = () => {
-    // Tell TypeScript this is an HTMLButtonElement
-    const btn = document.querySelector<HTMLButtonElement>('[data-toggle-certificates]');
-    const panel = document.getElementById('certificates');
+    <div
+      class="grid grid-cols-2 justify-items-center gap-x-4 gap-y-6 sm:grid-cols-3"
+    >
+      <div data-iframe-width="152" data-iframe-height="270" data-share-badge-id="ea6b048a-927e-47c6-9e13-f0c13e506a8b" data-share-badge-host="https://www.credly.com"></div>
+      <div data-iframe-width="152" data-iframe-height="270" data-share-badge-id="b0aa8684-9d09-47c6-8bc7-9a05c229ac54" data-share-badge-host="https://www.credly.com"></div>
+      <div data-iframe-width="152" data-iframe-height="270" data-share-badge-id="6d904561-a859-4e35-a077-419ffd6d6d33" data-share-badge-host="https://www.credly.com"></div>
+      <div data-iframe-width="152" data-iframe-height="270" data-share-badge-id="5922f724-9782-4e06-982f-4a794db44b46" data-share-badge-host="https://www.credly.com"></div>
+      <div data-iframe-width="152" data-iframe-height="270" data-share-badge-id="fe751831-6719-49a6-8f2c-4b0bb48d5ba3" data-share-badge-host="https://www.credly.com"></div>
+      <div data-iframe-width="152" data-iframe-height="270" data-share-badge-id="3e7e48e1-ba0e-4054-ae13-0a4fdd646dd2" data-share-badge-host="https://www.credly.com"></div>
+      <script type="text/javascript" async is:inline src="//cdn.credly.com/assets/utilities/embed.js"></script>
+    </div>
 
-    if (!btn || !panel) return;
+    <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+      <a
+        href="/resume.pdf"
+        class="group link-sweep text-foreground hover:text-accent inline-flex items-center gap-1 font-semibold"
+      >
+        Download résumé
+        <Icon
+          name="lucide:arrow-down"
+          class="size-3.5 opacity-60 transition-[opacity,translate] duration-300 group-hover:translate-y-0.5 group-hover:opacity-100"
+        />
+      </a>
+      <button
+        type="button"
+        class="text-muted-foreground hover:text-accent inline-flex cursor-pointer items-center gap-1.5 transition-colors"
+        aria-expanded="false"
+        aria-controls="certificates"
+        data-toggle-certificates
+      >
+        <span data-label>Show certificate scans</span>
+        <Icon
+          name="lucide:chevron-down"
+          class="size-4 transition-transform duration-300 [[aria-expanded=true]_&]:rotate-180"
+        />
+      </button>
+    </div>
 
-    // Avoid double-binding when Astro swaps pages
-    if (btn.dataset.initialized === 'true') return;
-    btn.dataset.initialized = 'true';
+    <div id="certificates" class="mt-6 hidden space-y-6">
+      {
+        sortedCerts.map((cert) => (
+          <figure>
+            <img
+              src={typeof cert.image === 'string' ? cert.image : cert.image.src}
+              alt={cert.alt}
+              class="h-auto w-full max-w-full rounded-md border object-contain"
+              loading="lazy"
+            />
+            <figcaption class="text-muted-foreground mt-2 text-sm">
+              {cert.caption}
+            </figcaption>
+          </figure>
+        ))
+      }
+    </div>
+  </section>
 
-    let open = false;
+  <section class="mt-14" data-reveal>
+    <div class="mb-6 border-b pb-3">
+      <h2 class="text-xl font-semibold">PGP public key</h2>
+    </div>
 
-    const setLabel = () => {
-      btn.textContent = open
-        ? 'Hide certifications & profiles'
-        : 'Show certifications & profiles';
-    };
+    <dl class="grid gap-x-8 gap-y-4 text-sm sm:grid-cols-[8rem_minmax(0,1fr)]">
+      <dt class="text-muted-foreground">Fingerprint</dt>
+      <dd class="font-mono text-[0.95rem] tracking-wide">
+        {
+          fingerprintGroups.map((g, i) => (
+            <span class:list={[i === 5 && 'sm:ml-3']}>{g} </span>
+          ))
+        }
+      </dd>
+      <dt class="text-muted-foreground">User ID</dt>
+      <dd>rahul.infosec@proton.me</dd>
+      <dt class="text-muted-foreground">Type</dt>
+      <dd>255-bit EdDSA · signing, encryption, certification</dd>
+      <dt class="text-muted-foreground">Valid from</dt>
+      <dd>June 28, 2025</dd>
+    </dl>
 
-    setLabel();
+    <details class="group/key mt-6">
+      <summary
+        class="text-muted-foreground hover:text-accent inline-flex cursor-pointer list-none items-center gap-1.5 text-sm transition-colors [&::-webkit-details-marker]:hidden"
+      >
+        Show full key
+        <Icon
+          name="lucide:chevron-down"
+          class="size-4 transition-transform duration-300 group-open/key:rotate-180"
+        />
+      </summary>
+      <pre
+        class="bg-muted text-muted-foreground mt-4 max-h-80 overflow-auto rounded-md p-4 font-mono text-xs leading-relaxed"
+        data-pgp-key>{publicKey.trim()}</pre>
+    </details>
 
-    btn.addEventListener('click', () => {
-      open = !open;
-      panel.classList.toggle('hidden', !open);
-      setLabel();
-    });
-  };
+    <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 text-[0.95rem]">
+      <button
+        type="button"
+        class="group link-sweep text-foreground hover:text-accent inline-flex cursor-pointer items-center gap-1.5 font-semibold"
+        data-copy-key
+      >
+        <Icon name="lucide:copy" class="size-3.5" data-icon-copy />
+        <Icon name="lucide:check" class="hidden size-3.5" data-icon-done />
+        <span data-copy-label>Copy key</span>
+      </button>
+      <a
+        href="/downloadables/purpleshonen-publickey.asc"
+        download="purpleshonen-publickey.asc"
+        class={linkClass}
+      >
+        Download .asc
+        <Icon
+          name="lucide:arrow-down"
+          class="size-3.5 opacity-60 transition-[opacity,translate] duration-300 group-hover:translate-y-0.5 group-hover:opacity-100"
+        />
+      </a>
+      <a href="mailto:rahul.infosec@proton.me" class={linkClass}>
+        Email me
+        <Icon name="lucide:arrow-up-right" class={iconClass} />
+      </a>
+    </div>
+  </section>
 
-  // Run on first load and on client-side navigations
-  document.addEventListener('astro:page-load', initCertificatesToggle);
-  document.addEventListener('astro:after-swap', initCertificatesToggle);
-</script>
+  <script>
+    const initAbout = () => {
+      const btn = document.querySelector<HTMLButtonElement>(
+        '[data-toggle-certificates]',
+      )
+      const panel = document.getElementById('certificates')
+      if (btn && panel && btn.dataset.initialized !== 'true') {
+        btn.dataset.initialized = 'true'
+        const label = btn.querySelector('[data-label]')
+        btn.addEventListener('click', () => {
+          const open = btn.getAttribute('aria-expanded') !== 'true'
+          btn.setAttribute('aria-expanded', String(open))
+          panel.classList.toggle('hidden', !open)
+          if (label)
+            label.textContent = open
+              ? 'Hide certificate scans'
+              : 'Show certificate scans'
+        })
+      }
 
+      const copy = document.querySelector<HTMLButtonElement>('[data-copy-key]')
+      const key = document.querySelector('[data-pgp-key]')
+      if (copy && key && copy.dataset.initialized !== 'true') {
+        copy.dataset.initialized = 'true'
+        const label = copy.querySelector('[data-copy-label]')
+        const iconCopy = copy.querySelector('[data-icon-copy]')
+        const iconDone = copy.querySelector('[data-icon-done]')
+        copy.addEventListener('click', async () => {
+          try {
+            await navigator.clipboard.writeText(key.textContent ?? '')
+            if (label) label.textContent = 'Copied'
+            iconCopy?.classList.add('hidden')
+            iconDone?.classList.remove('hidden')
+            setTimeout(() => {
+              if (label) label.textContent = 'Copy key'
+              iconCopy?.classList.remove('hidden')
+              iconDone?.classList.add('hidden')
+            }, 2000)
+          } catch {
+            if (label) label.textContent = 'Copy failed — use Download .asc'
+          }
+        })
+      }
+    }
 
+    document.addEventListener('astro:page-load', initAbout)
+  </script>
 </Layout>

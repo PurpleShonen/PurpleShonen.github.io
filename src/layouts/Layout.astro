@@ -4,6 +4,8 @@ import '@/styles/typography.css'
 
 
 import Footer from '@/components/Footer.astro'
+import Loader from '@/components/Loader.astro'
+import Motion from '@/components/Motion.astro'
 import Head from '@/components/Head.astro'
 import Header from '@/components/Header.astro'
 import { SITE } from '@/consts'
@@ -20,11 +22,13 @@ const { class: className } = Astro.props
 <html
   class="bg-background text-foreground scheme-light-dark"
   lang={SITE.locale}
+  data-theme="dark"
 >
   <Head>
     <slot name="head" />
   </Head>
   <body class="flex h-fit min-h-screen flex-col gap-y-6 font-sans">
+    <Loader />
     <header
       class="bg-background/50 sticky top-0 z-50 divide-y backdrop-blur-sm xl:divide-none"
     >
@@ -38,6 +42,7 @@ const { class: className } = Astro.props
       <slot />
     </main>
     <Footer />
+    <Motion />
 
 
     <script is:inline>

@@ -1,0 +1,193 @@
+---
+// Site motion, one vocabulary everywhere:
+//   ease  expo.out  (CSS twin: cubic-bezier(0.16, 1, 0.3, 1), see global.css)
+//   1.0s for entrances, 0.8s for reveals, 16px rise, 0.06s stagger.
+// Every page plays the same entrance: media settles, the headword rises
+// letter by letter through a mask (total spread capped so long titles
+// don't drag), then the intro lines follow. Content further down rises
+// once as it enters. Reduced-motion visitors get none of it; the reading
+// progress line is a direct scroll readout, so it always runs.
+---
+
+<script>
+  import { gsap } from 'gsap'
+  import { ScrollTrigger } from 'gsap/ScrollTrigger'
+  import { SplitText } from 'gsap/SplitText'
+
+  gsap.registerPlugin(ScrollTrigger, SplitText)
+
+  const EASE = 'expo.out'
+  const ENTER = 1.0
+  const REVEAL = 0.8
+  const RISE = 16
+  const STAGGER = 0.06
+  const HEADWORD_SPREAD = 0.45 // max seconds between first and last letter
+
+  const root = document.documentElement
+  const prefersReduced = () =>
+    window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  let mm: gsap.MatchMedia | null = null
+
+  const release = () => root.classList.remove('motion-pending')
+
+  function readingProgress() {
+    const bar = document.querySelector<HTMLElement>('[data-reading-progress]')
+    const article = document.querySelector<HTMLElement>('[data-article]')
+    if (!bar || !article) return
+    gsap.to(bar, {
+      scaleX: 1,
+      ease: 'none',
+      scrollTrigger: {
+        trigger: article,
+        start: 'top 30%',
+        end: 'bottom bottom',
+        scrub: 0.3,
+      },
+    })
+  }
+
+  function entrance() {
+    const media = gsap.utils.toArray<HTMLElement>('[data-media-reveal]')
+    const headword = document.querySelector<HTMLElement>('[data-headword]')
+    const intro = gsap.utils.toArray<HTMLElement>('[data-intro]')
+    const tl = gsap.timeline({ defaults: { ease: EASE, duration: ENTER } })
+    let split: SplitText | null = null
+
+    if (media.length) {
+      tl.from(
+        media,
+        { autoAlpha: 0, scale: 1.03, clipPath: 'inset(4% 4% 4% 4% round 6px)' },
+        0,
+      )
+    }
+
+    if (headword) {
+      split = SplitText.create(headword, { type: 'words,chars', mask: 'chars' })
+      const n = split.chars.length
+      tl.from(
+        split.chars,
+        {
+          yPercent: 110,
+          stagger: Math.min(0.028, HEADWORD_SPREAD / Math.max(n - 1, 1)),
+        },
+        media.length ? 0.12 : 0,
+      )
+    }
+
+    if (intro.length) {
+      tl.from(
+        intro,
+        { autoAlpha: 0, y: RISE, stagger: STAGGER },
+        headword || media.length ? 0.35 : 0,
+      )
+    }
+
+    release()
+    return { tl, split }
+  }
+
+  function reveals(afterEntrance: number) {
+    const items = gsap.utils.toArray<HTMLElement>('[data-reveal]')
+    gsap.set(items, { autoAlpha: 0, y: RISE })
+    const born = performance.now()
+
+    ScrollTrigger.batch(items, {
+      start: 'top 92%',
+      once: true,
+      onEnter: (batch) => {
+        // Anything already on screen waits for the entrance to land first.
+        const sinceInit = (performance.now() - born) / 1000
+        gsap.to(batch, {
+          autoAlpha: 1,
+          y: 0,
+          ease: EASE,
+          duration: REVEAL,
+          stagger: STAGGER,
+          delay: Math.max(afterEntrance - sinceInit, 0),
+          overwrite: true,
+        })
+      },
+    })
+
+    // Figures and code blocks inside articles lift once, the same way.
+    gsap.utils
+      .toArray<HTMLElement>('[data-article] img, [data-article] .expressive-code')
+      .forEach((el) => {
+        gsap.from(el, {
+          autoAlpha: 0,
+          y: RISE,
+          ease: EASE,
+          duration: REVEAL,
+          scrollTrigger: { trigger: el, start: 'top 90%', once: true },
+        })
+      })
+  }
+
+  function init() {
+    mm?.revert()
+    mm = gsap.matchMedia()
+
+    mm.add('(prefers-reduced-motion: no-preference)', () => {
+      const { split } = entrance()
+      reveals(0.55)
+      return () => split?.revert()
+    })
+
+    readingProgress()
+    release()
+  }
+
+  // Every page starts its entrance at the same moment: as soon as its
+  // content is in the document. First load waits for the intro loader;
+  // page-to-page navigations start right after Astro swaps the content in.
+  let navId = 0
+  let initedFor = -1
+
+  function start() {
+    if (initedFor === navId) return
+    initedFor = navId
+    init()
+  }
+
+  function firstLoad() {
+    if (root.classList.contains('is-loading')) {
+      let started = false
+      const go = () => {
+        if (started) return
+        started = true
+        start()
+      }
+      document.addEventListener('loader:done', go, { once: true })
+      setTimeout(go, 3200)
+    } else {
+      start()
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', firstLoad, { once: true })
+  } else {
+    firstLoad()
+  }
+
+  document.addEventListener('astro:before-swap', () => {
+    navId++
+    mm?.revert()
+    mm = null
+    ScrollTrigger.getAll().forEach((t) => t.kill())
+  })
+
+  document.addEventListener('astro:after-swap', () => {
+    if (!prefersReduced()) root.classList.add('motion-pending')
+    // Next frame: the new DOM is in place and styled.
+    requestAnimationFrame(start)
+  })
+
+  // Once islands and images have settled, recompute scroll positions.
+  document.addEventListener('astro:page-load', () => {
+    start()
+    requestAnimationFrame(() => ScrollTrigger.refresh())
+  })
+  window.addEventListener('load', () => ScrollTrigger.refresh())
+</script>

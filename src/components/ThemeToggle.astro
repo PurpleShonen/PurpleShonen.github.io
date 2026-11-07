@@ -20,9 +20,8 @@ import { Icon } from 'astro-icon/components'
     const theme = (() => {
       const stored = localStorage?.getItem('theme') ?? ''
       if (['dark', 'light'].includes(stored)) return stored
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light'
+      // Dark is the default; light only when the visitor chose it.
+      return 'dark'
     })()
 
     document.documentElement.setAttribute('data-theme', theme)
@@ -31,11 +30,8 @@ import { Icon } from 'astro-icon/components'
 </script>
 
 <script>
-  function handleToggleClick() {
+  function applyTheme(newTheme: string) {
     const element = document.documentElement
-    const currentTheme = element.getAttribute('data-theme')
-    const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
-
     element.classList.add('[&_*]:transition-none')
     element.setAttribute('data-theme', newTheme)
     window.getComputedStyle(element).getPropertyValue('opacity')
@@ -47,6 +43,23 @@ import { Icon } from 'astro-icon/components'
     localStorage.setItem('theme', newTheme)
   }
 
+  function handleToggleClick() {
+    const currentTheme = document.documentElement.getAttribute('data-theme')
+    const newTheme = currentTheme === 'dark' ? 'light' : 'dark'
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+    // Crossfade the whole page between themes where the browser supports it.
+    if (!reduce && 'startViewTransition' in document) {
+      document.documentElement.classList.add('theme-swap')
+      const t = document.startViewTransition(() => applyTheme(newTheme))
+      t.finished.finally(() =>
+        document.documentElement.classList.remove('theme-swap'),
+      )
+    } else {
+      applyTheme(newTheme)
+    }
+  }
+
   function initThemeToggle() {
     document
       .getElementById('theme-toggle')
@@ -56,7 +69,7 @@ import { Icon } from 'astro-icon/components'
   initThemeToggle()
 
   document.addEventListener('astro:after-swap', () => {
-    const storedTheme = localStorage.getItem('theme') || 'light'
+    const storedTheme = localStorage.getItem('theme') || 'dark'
     const element = document.documentElement
 
     element.classList.add('[&_*]:transition-none')

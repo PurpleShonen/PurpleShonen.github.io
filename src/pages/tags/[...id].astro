@@ -40,10 +40,23 @@ const { tag, posts } = Astro.props
     ]}
   />
 
-  <ul class="flex flex-col gap-y-4">
+  <header class="mt-4">
+    <h1
+      data-headword
+      class="text-4xl font-semibold tracking-[-0.03em] sm:text-6xl"
+    >
+      #{tag}
+    </h1>
+    <p data-intro class="text-muted-foreground mt-3 text-sm">
+      {posts.length} {posts.length === 1 ? 'post' : 'posts'} &middot;
+      <a href="/tags" class="hover:text-accent transition-colors">All topics</a>
+    </p>
+  </header>
+
+  <ul class="mt-8 flex flex-col border-b">
     {
       posts.map((post) => (
-        <li>
+        <li data-reveal>
           <BlogCard entry={post} />
         </li>
       ))

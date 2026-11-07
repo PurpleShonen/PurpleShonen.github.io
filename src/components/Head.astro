@@ -43,6 +43,25 @@ import Favicons from './Favicons.astro'
 
 
 
+  <script is:inline>
+    // Hold the homepage entrance until GSAP takes over; never longer than 2.5s.
+    ;(() => {
+      const root = document.documentElement
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        root.classList.add('motion-pending')
+        setTimeout(() => root.classList.remove('motion-pending'), 4000)
+      }
+      // Intro loader: first visit per session only, never longer than 3s.
+      try {
+        if (!sessionStorage.getItem('ps-intro')) {
+          sessionStorage.setItem('ps-intro', '1')
+          root.classList.add('is-loading')
+          setTimeout(() => root.classList.remove('is-loading'), 3000)
+        }
+      } catch {}
+    })()
+  </script>
+
   <Favicons />
   <ClientRouter />
 

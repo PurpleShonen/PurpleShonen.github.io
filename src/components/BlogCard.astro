@@ -1,18 +1,12 @@
 ---
-import AvatarComponent from '@/components/ui/avatar'
-import { Badge } from '@/components/ui/badge'
-import { Separator } from '@/components/ui/separator'
 import {
   getCombinedReadingTime,
   getSubpostCount,
   isSubpost,
-  parseAuthors,
 } from '@/lib/data-utils'
 import { formatDate } from '@/lib/utils'
-import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
 import type { CollectionEntry } from 'astro:content'
-import Link from './Link.astro'
 
 interface Props {
   entry: CollectionEntry<'blog'>
@@ -21,95 +15,70 @@ interface Props {
 const { entry } = Astro.props
 const formattedDate = formatDate(entry.data.date)
 const readTime = await getCombinedReadingTime(entry.id)
-const authors = await parseAuthors(entry.data.authors ?? [])
 const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
 ---
 
-<div
-  class="group hover:bg-muted/40 hover:border-foreground/15 rounded-xl border transition-colors duration-300 ease-out"
+<a
+  href={`/${entry.collection}/${entry.id}`}
+  class="group grid gap-4 border-t py-6 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-6"
 >
-  <Link
-    href={`/${entry.collection}/${entry.id}`}
-    class="flex flex-col gap-4 rounded-xl p-4 sm:flex-row sm:gap-5"
-  >
-    {
-      entry.data.image && (
-        <div class="w-full sm:max-w-3xs sm:shrink-0">
-          {typeof entry.data.image === 'string' ? (
-            <img
-              src={entry.data.image}
-              alt={entry.data.title}
-              width={1200}
-              height={630}
-              class="aspect-[1200/630] w-full rounded-md object-cover"
-            />
-          ) : (
-            <Image
-              src={entry.data.image}
-              alt={entry.data.title}
-              width={1200}
-              height={630}
-              class="aspect-[1200/630] w-full rounded-md object-cover"
-            />
-          )}
-        </div>
-      )
-    }
-
-    <div class="min-w-0 grow">
-      <h3 class="group-hover:text-primary mb-1 text-lg leading-snug font-medium transition-colors">{entry.data.title}</h3>
-      <p class="text-muted-foreground mb-2 text-sm">{entry.data.description}</p>
-
-      <div
-        class="text-muted-foreground mb-2 flex flex-wrap items-center gap-x-2 text-xs"
-      >
-        {
-          authors.length > 0 && (
-            <>
-              {authors.map((author) => (
-                <div class="flex items-center gap-x-1.5">
-                  <AvatarComponent
-                    client:load
-                    src={author.avatarSrc}
-                    alt={author.name}
-                    fallback={author.name[0]}
-                    className="size-5 rounded-full"
-                  />
-                  <span>{author.name}</span>
-                </div>
-              ))}
-              <Separator orientation="vertical" className="h-4!" />
-            </>
-          )
-        }
-        <span>{formattedDate}</span>
-        <Separator orientation="vertical" className="h-4!" />
-        <span>{readTime}</span>
-        {
-          subpostCount > 0 && (
-            <>
-              <Separator orientation="vertical" className="h-4!" />
-              <span class="flex items-center gap-1">
-                <Icon name="lucide:file-text" class="size-3" />
-                {subpostCount} subpost{subpostCount === 1 ? '' : 's'}
-              </span>
-            </>
-          )
-        }
+  {
+    entry.data.image && (
+      <div class="bg-muted hidden aspect-[1200/630] w-full self-start overflow-hidden rounded-[4px] sm:block">
+        {typeof entry.data.image === 'string' ? (
+          <img
+            src={entry.data.image}
+            alt=""
+            width={1200}
+            height={630}
+            loading="lazy"
+            class="block h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-90"
+          />
+        ) : (
+          <Image
+            src={entry.data.image}
+            alt=""
+            width={480}
+            height={252}
+            class="block h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-90"
+          />
+        )}
       </div>
+    )
+  }
 
+  <div class:list={['min-w-0', !entry.data.image && 'sm:col-span-2']}>
+    <h3
+      class="group-hover:text-accent text-lg leading-snug font-semibold tracking-[-0.015em] text-balance transition-colors"
+    >
+      {entry.data.title}
+    </h3>
+    <p class="text-muted-foreground mt-1.5 text-[0.95rem] leading-relaxed">
+      {entry.data.description}
+    </p>
+    <p
+      class="text-muted-foreground/80 mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.8125rem]"
+    >
+      <time datetime={entry.data.date.toISOString()}>{formattedDate}</time>
+      <span aria-hidden="true">&middot;</span>
+      <span>{readTime}</span>
       {
-        entry.data.tags && (
-          <div class="flex flex-wrap gap-2">
-            {entry.data.tags.map((tag) => (
-              <Badge variant="muted" className="flex items-center gap-x-1">
-                <Icon name="lucide:hash" class="size-3" />
-                {tag}
-              </Badge>
-            ))}
-          </div>
+        subpostCount > 0 && (
+          <>
+            <span aria-hidden="true">&middot;</span>
+            <span>
+              {subpostCount} subpost{subpostCount === 1 ? '' : 's'}
+            </span>
+          </>
         )
       }
-    </div>
-  </Link>
-</div>
+    </p>
+    {
+      entry.data.tags && entry.data.tags.length > 0 && (
+        <p class="text-muted-foreground/70 mt-1 text-[0.8125rem]">
+          {entry.data.tags.join(', ')}
+        </p>
+      )
+    }
+  </div>
+</a>

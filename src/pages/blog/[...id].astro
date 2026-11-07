@@ -1,6 +1,5 @@
 ---
 import Breadcrumbs from '@/components/Breadcrumbs.astro'
-import Link from '@/components/Link.astro'
 import Giscus from "@/components/Giscus.astro";
 
 import PostHead from '@/components/PostHead.astro'
@@ -9,7 +8,6 @@ import SubpostsHeader from '@/components/SubpostsHeader.astro'
 import SubpostsSidebar from '@/components/SubpostsSidebar.astro'
 import TOCHeader from '@/components/TOCHeader.astro'
 import TOCSidebar from '@/components/TOCSidebar.astro'
-import { badgeVariants } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import Layout from '@/layouts/Layout.astro'
 import {
@@ -27,6 +25,7 @@ import {
 } from '@/lib/data-utils'
 import { formatDate } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
+import avatar from '@/content/authors/logo.jpg'
 import { Image } from 'astro:assets'
 import { render } from 'astro:content'
 
@@ -62,6 +61,11 @@ const tocSections = await getTOCSections(currentPostId)
 
 <Layout>
   <PostHead slot="head" post={post} />
+  <div
+    class="bg-accent fixed inset-x-0 top-0 z-[60] h-0.5 origin-left scale-x-0"
+    data-reading-progress
+    aria-hidden="true"
+  ></div>
   {
     (hasChildPosts || isCurrentSubpost) && (
       <SubpostsHeader
@@ -116,7 +120,8 @@ const tocSections = await getTOCSections(currentPostId)
           <img
             src={post.data.image}
             alt={post.data.title}
-            class="col-span-full mx-auto w-full max-w-5xl object-cover"
+            class="col-span-full mx-auto w-full max-w-4xl rounded-md object-cover"
+            data-media-reveal
           />
         ) : (
           <Image
@@ -124,111 +129,101 @@ const tocSections = await getTOCSections(currentPostId)
             alt={post.data.title}
             width={1200}
             height={630}
-            class="col-span-full mx-auto w-full max-w-5xl object-cover"
+            class="col-span-full mx-auto w-full max-w-4xl rounded-md object-cover"
+            data-media-reveal
           />
         ))
     }
 
-    <section class="col-start-2 flex flex-col gap-y-6 text-center">
-      <div class="flex flex-col">
+    <section class="col-start-2 flex flex-col gap-y-8">
+      <header class="flex flex-col">
         <h1
-          class="mb-2 scroll-mt-31 text-3xl leading-tight font-medium sm:text-4xl"
+          data-headword
+          class="scroll-mt-31 text-4xl leading-[1.05] font-semibold tracking-[-0.03em] text-balance sm:text-5xl"
           id="post-title"
         >
           {post.data.title}
         </h1>
 
-        <div
-          class="text-muted-foreground divide-border mb-4 flex flex-col items-center justify-center divide-y text-xs sm:flex-row sm:flex-wrap sm:divide-x sm:divide-y-0 sm:text-sm"
+        <p
+          data-intro
+          class="text-muted-foreground mt-5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-sm"
         >
           {
-            authors.length > 0 && (
-              <div class="flex w-full items-center justify-center gap-x-2 py-2 sm:w-fit sm:px-2 sm:py-0 first:sm:pl-0 last:sm:pr-0">
-                {authors.map((author) => (
-                  <div class="flex items-center gap-x-1.5">
-                    {author.avatar &&
-                      (typeof author.avatar === 'string' ? (
-                        <img
-                          src={author.avatar}
-                          alt={author.name}
-                          class="rounded-full w-5 h-5"
-                          width="20"
-                          height="20"
-                        />
-                      ) : (
-                        <Image
-                          src={author.avatar}
-                          alt={author.name}
-                          width={20}
-                          height={20}
-                          class="rounded-full"
-                        />
-                      ))}
-                    {author.isRegistered ? (
-                      <Link
-                        href={`/authors/${author.id}`}
-                        underline
-                        class="text-foreground"
-                      >
-                        <span>{author.name}</span>
-                      </Link>
-                    ) : (
-                      <span>{author.name}</span>
-                    )}
-                  </div>
-                ))}
-              </div>
-            )
+            authors.map((author) => (
+              <span class="inline-flex items-center gap-2">
+                {author.avatar &&
+                  (typeof author.avatar === 'string' ? (
+                    <img
+                      src={author.avatar}
+                      alt=""
+                      class="size-5 rounded-full"
+                      width="20"
+                      height="20"
+                    />
+                  ) : (
+                    <Image
+                      src={author.avatar}
+                      alt=""
+                      width={40}
+                      height={40}
+                      class="size-5 rounded-full"
+                    />
+                  ))}
+                {author.isRegistered ? (
+                  <a
+                    href={`/authors/${author.id}`}
+                    class="text-foreground hover:text-accent transition-colors"
+                  >
+                    {author.name}
+                  </a>
+                ) : (
+                  <span class="text-foreground">{author.name}</span>
+                )}
+              </span>
+            ))
           }
-
-          <div
-            class="flex w-full items-center justify-center gap-2 py-2 sm:w-fit sm:px-2 sm:py-0 first:sm:pl-0 last:sm:pr-0"
-          >
-            <span>{formatDate(post.data.date)}</span>
-          </div>
-
-          <div
-            class="flex w-full items-center justify-center gap-2 py-2 sm:w-fit sm:px-2 sm:py-0 first:sm:pl-0 last:sm:pr-0"
-          >
-            <span>
-              {postReadingTime}
-              {
-                combinedReadingTime &&
-                  combinedReadingTime !== postReadingTime && (
-                    <span class="text-muted-foreground">
-                      {' '}
-                      ({combinedReadingTime} total)
-                    </span>
-                  )
-              }
-            </span>
-          </div>
-
+          {authors.length > 0 && <span aria-hidden="true">&middot;</span>}
+          <time datetime={post.data.date.toISOString()}>
+            {formatDate(post.data.date)}
+          </time>
+          <span aria-hidden="true">&middot;</span>
+          <span>
+            {postReadingTime}
+            {
+              combinedReadingTime &&
+                combinedReadingTime !== postReadingTime && (
+                  <span> ({combinedReadingTime} total)</span>
+                )
+            }
+          </span>
           {
             subpostCount > 0 && (
-              <div class="flex w-full items-center justify-center gap-1 py-2 sm:w-fit sm:px-2 sm:py-0 first:sm:pl-0 last:sm:pr-0">
-                <Icon name="lucide:file-text" class="size-3" />
-                {subpostCount} subpost{subpostCount === 1 ? '' : 's'}
-              </div>
+              <>
+                <span aria-hidden="true">&middot;</span>
+                <span>
+                  {subpostCount} subpost{subpostCount === 1 ? '' : 's'}
+                </span>
+              </>
             )
           }
-        </div>
-        <div class="flex flex-wrap justify-center gap-2">
-          {
-            post.data.tags &&
-              post.data.tags.length > 0 &&
-              post.data.tags.map((tag) => (
+        </p>
+
+        {
+          post.data.tags && post.data.tags.length > 0 && (
+            <p data-intro class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-sm">
+              {post.data.tags.map((tag) => (
                 <a
                   href={`/tags/${tag}`}
-                  class={badgeVariants({ variant: 'muted' })}
+                  class="text-muted-foreground hover:text-accent transition-colors"
                 >
-                  <Icon name="lucide:hash" class="size-3" />
-                  {tag}
+                  #{tag}
                 </a>
-              ))
-          }
-        </div>
-      </div>
+              ))}
+            </p>
+          )
+        }
+      </header>
 
       <PostNavigation
         newerPost={navigation.newer}
@@ -243,9 +238,32 @@ const tocSections = await getTOCSections(currentPostId)
       )
     }
 
-    <article class="prose col-start-2 max-w-none">
+    <article class="prose col-start-2 max-w-none" data-article>
       <Content />
     </article>
+
+    <aside
+      class="col-start-2 mt-6 flex items-center gap-4 border-t pt-8"
+      data-reveal
+      aria-label="About the author"
+    >
+      <Image
+        src={avatar}
+        alt=""
+        width={96}
+        height={96}
+        class="ring-border size-12 shrink-0 rounded-full ring-1"
+      />
+      <div class="min-w-0">
+        <p class="font-semibold">Written by PurpleShonen</p>
+        <p class="text-muted-foreground text-sm">
+          Aspiring SOC analyst writing up investigations as I learn.
+          <a href="/about" class="text-foreground hover:text-accent underline decoration-muted-foreground underline-offset-4 transition-colors">About me</a>
+          &middot;
+          <a href="/resume.pdf" class="text-foreground hover:text-accent underline decoration-muted-foreground underline-offset-4 transition-colors">Résumé</a>
+        </p>
+      </div>
+    </aside>
 
 
 

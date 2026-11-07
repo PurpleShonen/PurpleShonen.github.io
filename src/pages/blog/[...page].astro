@@ -5,8 +5,16 @@ import PageHead from '@/components/PageHead.astro'
 import PaginationComponent from '@/components/ui/pagination'
 import { SITE } from '@/consts'
 import Layout from '@/layouts/Layout.astro'
-import { getAllPosts, groupPostsByYear } from '@/lib/data-utils'
+import {
+  getAllPosts,
+  getCombinedReadingTime,
+  getSortedTags,
+  groupPostsByYear,
+} from '@/lib/data-utils'
+import { formatDate } from '@/lib/utils'
 import type { PaginateFunction } from 'astro'
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
 
 export async function getStaticPaths({
   paginate,
@@ -19,7 +27,19 @@ export async function getStaticPaths({
 
 const { page } = Astro.props
 
-const postsByYear = groupPostsByYear(page.data)
+const allPosts = await getAllPosts()
+const allTopics = await getSortedTags()
+const topics = allTopics.slice(0, 10)
+
+// The newest post leads page one as a feature; everything else is grouped by year.
+const isFirstPage = page.currentPage === 1
+const featured = isFirstPage ? page.data[0] : undefined
+const rest = isFirstPage ? page.data.slice(1) : page.data
+const featuredReadTime = featured
+  ? await getCombinedReadingTime(featured.id)
+  : ''
+
+const postsByYear = groupPostsByYear(rest)
 const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a))
 ---
 
@@ -32,14 +52,125 @@ const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a))
     ]}
   />
 
-  <div class="flex min-h-[calc(100vh-18rem)] flex-col gap-y-8">
+  <header class="mt-4">
+    <h1
+      data-headword
+      class="text-4xl font-semibold tracking-[-0.03em] sm:text-6xl"
+    >
+      Blog
+    </h1>
+    <p
+      data-intro
+      class="text-foreground/85 mt-5 max-w-[58ch] text-lg leading-relaxed"
+    >
+      Investigation writeups, CTF walkthroughs and notes from hands-on blue-team
+      learning — written so you can follow the reasoning, not just the answer.
+    </p>
+    <p data-intro class="text-muted-foreground mt-3 text-sm">
+      {allPosts.length} posts &middot; {allTopics.length} topics
+    </p>
+
+    {
+      topics.length > 0 && (
+        <ul
+          data-intro
+          class="mt-6 flex flex-wrap gap-x-4 gap-y-2 text-sm"
+          role="list"
+        >
+          {topics.map(({ tag, count }) => (
+            <li>
+              <a
+                href={`/tags/${tag}`}
+                class="group text-muted-foreground hover:text-accent inline-flex items-baseline gap-1 transition-colors"
+              >
+                #{tag}
+                <span class="text-muted-foreground/60 group-hover:text-accent/70 text-xs tabular-nums">
+                  {count}
+                </span>
+              </a>
+            </li>
+          ))}
+          <li>
+            <a
+              href="/tags"
+              class="text-foreground hover:text-accent inline-flex items-center gap-1 font-medium transition-colors"
+            >
+              All topics <Icon name="lucide:arrow-right" class="size-3.5" />
+            </a>
+          </li>
+        </ul>
+      )
+    }
+  </header>
+
+  {
+    featured && (
+      <section class="mt-12" aria-label="Latest post">
+        <a href={`/blog/${featured.id}`} class="group block" data-reveal>
+          {featured.data.image && (
+            <div class="bg-muted aspect-[1200/630] overflow-hidden rounded-md">
+              {typeof featured.data.image === 'string' ? (
+                <img
+                  src={featured.data.image}
+                  alt=""
+                  width={1200}
+                  height={630}
+                  class="block h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                />
+              ) : (
+                <Image
+                  src={featured.data.image}
+                  alt=""
+                  width={1200}
+                  height={630}
+                  loading="eager"
+                  class="block h-full w-full object-cover transition-transform duration-700 group-hover:scale-[1.02]"
+                />
+              )}
+            </div>
+          )}
+          <p class="text-accent mt-5 text-sm font-medium">Latest</p>
+          <h2 class="group-hover:text-accent mt-1 text-2xl leading-tight font-semibold tracking-[-0.02em] text-balance transition-colors sm:text-3xl">
+            {featured.data.title}
+          </h2>
+          <p class="text-muted-foreground mt-3 max-w-[62ch] leading-relaxed">
+            {featured.data.description}
+          </p>
+          <p class="text-muted-foreground/80 mt-3 text-[0.8125rem]">
+            <time datetime={featured.data.date.toISOString()}>
+              {formatDate(featured.data.date)}
+            </time>
+            <span aria-hidden="true"> &middot; </span>
+            {featuredReadTime}
+            {featured.data.tags && featured.data.tags.length > 0 && (
+              <>
+                <span aria-hidden="true"> &middot; </span>
+                {featured.data.tags.join(', ')}
+              </>
+            )}
+          </p>
+        </a>
+      </section>
+    )
+  }
+
+  <div class="mt-12 flex min-h-[20vh] flex-col gap-y-12">
     {
       years.map((year) => (
-        <section class="flex flex-col gap-y-4">
-          <div class="font-medium">{year}</div>
-          <ul class="flex flex-col gap-4">
+        <section class="flex flex-col">
+          <div
+            class="mb-1 flex items-baseline justify-between gap-4"
+            data-reveal
+          >
+            <h2 class="text-xl font-semibold tabular-nums">{year}</h2>
+            <span class="text-muted-foreground text-sm">
+              {postsByYear[year].length}{' '}
+              {postsByYear[year].length === 1 ? 'post' : 'posts'}
+            </span>
+          </div>
+          <ul class="flex flex-col border-b" role="list">
             {postsByYear[year].map((post) => (
-              <li>
+              <li data-reveal>
                 <BlogCard entry={post} />
               </li>
             ))}
@@ -49,10 +180,14 @@ const years = Object.keys(postsByYear).sort((a, b) => parseInt(b) - parseInt(a))
     }
   </div>
 
-  <PaginationComponent
-    currentPage={page.currentPage}
-    totalPages={page.lastPage}
-    baseUrl="/blog/"
-    client:load
-  />
+  {
+    page.lastPage > 1 && (
+      <PaginationComponent
+        currentPage={page.currentPage}
+        totalPages={page.lastPage}
+        baseUrl="/blog/"
+        client:load
+      />
+    )
+  }
 </Layout>

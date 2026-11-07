@@ -1,6 +1,4 @@
 ---
-import Link from '@/components/Link.astro'
-import { Badge } from '@/components/ui/badge'
 import { formatDate } from '@/lib/utils'
 import { Icon } from 'astro-icon/components'
 import { Image } from 'astro:assets'
@@ -11,71 +9,75 @@ interface Props {
 }
 
 const { project } = Astro.props
+const { link, image, name, description, startDate, endDate, tags } =
+  project.data
 ---
 
-<div
-  class="group hover:bg-muted/40 hover:border-foreground/15 rounded-xl border transition-colors duration-300 ease-out"
+<a
+  href={link ?? '/projects'}
+  target={link ? '_blank' : undefined}
+  rel={link ? 'noopener' : undefined}
+  class="group grid gap-4 border-t py-6 sm:grid-cols-[10rem_minmax(0,1fr)] sm:gap-6"
 >
-  <Link
-    href={project.data.link ?? '/projects'}
-    class="flex flex-col gap-4 rounded-xl p-4 sm:flex-row sm:gap-5"
-    external={Boolean(project.data.link)}
-    rel={project.data.link ? 'noopener' : undefined}
-  >
+  {
+    image && (
+      <div class="bg-muted hidden aspect-[1200/630] w-full self-start overflow-hidden rounded-[4px] sm:block">
+        {typeof image === 'string' ? (
+          <img
+            src={image}
+            alt=""
+            width={1200}
+            height={630}
+            loading="lazy"
+            class="block h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-90"
+          />
+        ) : (
+          <Image
+            src={image}
+            alt=""
+            width={480}
+            height={252}
+            class="block h-full w-full object-cover transition-opacity duration-300 group-hover:opacity-90"
+          />
+        )}
+      </div>
+    )
+  }
+
+  <div class:list={['min-w-0', !image && 'sm:col-span-2']}>
+    <h3
+      class="group-hover:text-accent inline-flex items-center gap-1.5 text-lg leading-snug font-semibold tracking-[-0.015em] transition-colors"
+    >
+      {name}
+      {
+        link && (
+          <Icon
+            name="lucide:arrow-up-right"
+            class="size-4 opacity-50 transition-opacity group-hover:opacity-100"
+          />
+        )
+      }
+    </h3>
+    <p class="text-muted-foreground mt-1.5 text-[0.95rem] leading-relaxed">
+      {description}
+    </p>
+    <p
+      class="text-muted-foreground/80 mt-3 flex flex-wrap gap-x-3 gap-y-1 text-[0.8125rem]"
+    >
+      {
+        startDate && (
+          <span>
+            {formatDate(startDate)} – {endDate ? formatDate(endDate) : 'Present'}
+          </span>
+        )
+      }
+    </p>
     {
-      project.data.image && (
-        <div class="w-full sm:max-w-3xs sm:shrink-0">
-          {typeof project.data.image === 'string' ? (
-            <img
-              src={project.data.image}
-              alt={project.data.name}
-              width={1200}
-              height={630}
-              class="aspect-[1200/630] w-full rounded-md object-cover"
-            />
-          ) : (
-            <Image
-              src={project.data.image}
-              alt={project.data.name}
-              width={1200}
-              height={630}
-              class="aspect-[1200/630] w-full rounded-md object-cover"
-            />
-          )}
-        </div>
+      tags && tags.length > 0 && (
+        <p class="text-muted-foreground/70 mt-1 text-[0.8125rem]">
+          {tags.join(', ')}
+        </p>
       )
     }
-    <div class="min-w-0 grow">
-      <h3 class="group-hover:text-primary mb-1 text-lg leading-snug font-medium transition-colors">
-        {project.data.name}
-      </h3>
-      <p class="text-muted-foreground mb-2 text-sm">
-        {project.data.description}
-      </p>
-      {
-        project.data.startDate && (
-          <p class="text-muted-foreground/70 mb-2 flex items-center gap-x-1.5 text-xs">
-            <span class="flex items-center gap-x-1.5">
-              <Icon name="lucide:calendar" class="size-3" />
-              <span>
-                {formatDate(project.data.startDate)}
-                {project.data.endDate
-                  ? ` → ${formatDate(project.data.endDate)}`
-                  : ' → Present'}
-              </span>
-            </span>
-          </p>
-        )
-      }
-      {
-        project.data.tags && (
-          <div class="flex flex-wrap gap-2">
-            {project.data.tags.map((tag: string) => (
-              <Badge variant="muted">{tag}</Badge>
-            ))}
-          </div>
-        )
-      }
-    </div>
-  </Link>
-</div>
+  </div>
+</a>

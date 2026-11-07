@@ -52,7 +52,7 @@ const { headings } = Astro.props
             <span class="text-muted-foreground ml-2">
               <Icon
                 name="lucide:chevron-down"
-                class="h-4 w-4 transition-transform duration-200 group-open:rotate-180"
+                class="h-4 w-4 transition-transform group-open:rotate-180"
               />
             </span>
           </div>
@@ -78,7 +78,7 @@ const { headings } = Astro.props
                 >
                   <a
                     href={`#${heading.slug}`}
-                    class="mobile-toc-item underline decoration-transparent underline-offset-[3px] transition-colors duration-200 hover:decoration-inherit"
+                    class="mobile-toc-item underline decoration-transparent underline-offset-[3px] transition-colors hover:decoration-inherit"
                     data-heading-id={heading.slug}
                   >
                     {heading.text}

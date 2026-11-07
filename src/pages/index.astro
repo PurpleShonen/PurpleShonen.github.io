@@ -1,69 +1,192 @@
 ---
 import BlogCard from '@/components/BlogCard.astro'
-import Link from '@/components/Link.astro'
 import PageHead from '@/components/PageHead.astro'
-import SocialIcons from '@/components/SocialIcons.astro'
-import { buttonVariants } from '@/components/ui/button'
-import { SITE, HERO_LINKS } from '@/consts'
+import ProjectCard from '@/components/ProjectCard.astro'
+import { HERO_LINKS, SITE } from '@/consts'
 import Layout from '@/layouts/Layout.astro'
-import { getRecentPosts } from '@/lib/data-utils'
-
+import { getAllProjects, getRecentPosts } from '@/lib/data-utils'
+import { Icon } from 'astro-icon/components'
+import { Image } from 'astro:assets'
+import avatar from '@/content/authors/logo.jpg'
 
 const blog = await getRecentPosts(SITE.featuredPostCount)
+const projects = (await getAllProjects()).slice(0, 2)
+
+const links = [
+  { href: '/resume.pdf', label: 'Résumé', external: false },
+  ...HERO_LINKS.map((l) => ({ ...l, external: true })),
+]
+
+const CREDLY = 'https://www.credly.com/users/rahuljoriya'
+const certifications = [
+  { name: 'CompTIA Security+', issuer: 'CompTIA' },
+  { name: 'Certified in Cybersecurity (CC)', issuer: 'ISC2' },
+  { name: 'ISO/IEC 27001 Lead Auditor', issuer: 'Mastermind Assurance' },
+  { name: 'CS50x: Introduction to Computer Science', issuer: 'Harvard · edX' },
+  { name: 'LFS101: Introduction to Linux', issuer: 'The Linux Foundation' },
+  { name: 'Cybersecurity Fundamentals', issuer: 'IBM SkillsBuild' },
+]
 ---
 
 <Layout class="max-w-3xl">
-  <PageHead slot="head" title="PurpleShonen | Aspiring SOC Analyst, Blue Team & Security Writeups" />
-  <section class="rounded-xl border">
-    <div class="flex flex-col gap-y-2 p-6 pb-5">
-      <h1 class="text-3xl leading-none font-medium sm:text-4xl">SOC An·a·lyst</h1>
-      <p class="text-muted-foreground text-sm">
-        /ˌes.oʊˈsiː ˈæn.əl.ɪst/ &bull; <span class="font-medium italic">noun</span>
-      </p>
+  <PageHead
+    slot="head"
+    title="PurpleShonen | Aspiring SOC Analyst, Blue Team & Security Writeups"
+  />
+
+  <section class="pt-8 pb-2 sm:pt-16">
+    <div class="flex items-center gap-4 sm:gap-6">
+      <Image
+        src={avatar}
+        alt="PurpleShonen avatar"
+        width={160}
+        height={160}
+        loading="eager"
+        data-intro
+        class="ring-border size-14 shrink-0 rounded-full ring-1 sm:size-[4.5rem]"
+      />
+      <h1
+        data-headword
+        class="text-[2.6rem] leading-[0.95] font-semibold tracking-[-0.035em] min-[400px]:text-5xl sm:text-7xl"
+      >
+        SOC <span class="whitespace-nowrap">An<span class="text-accent">·</span>a<span class="text-accent">·</span>lyst</span>
+      </h1>
     </div>
+    <p data-intro class="text-muted-foreground mt-4 text-lg">
+      /ˌes.oʊˈsiː ˈæn.əl.ɪst/ &middot; <i>noun</i>
+    </p>
 
-    <div class="p-6 pt-0">
-  <p class="text-muted-foreground mb-3 text-sm leading-relaxed">
-    An aspiring SOC analyst focused on defending systems — learning to monitor,
-    triage alerts, investigate incidents, and turn noisy telemetry into clear
-    answers. I build hands-on labs around SIEM, log analysis, network traffic,
-    phishing analysis, and threat intelligence, and automate the repetitive parts
-    with Python.
-  </p>
+    <p
+      data-intro
+      class="text-foreground/90 mt-10 max-w-[62ch] text-lg leading-relaxed"
+    >
+      An aspiring SOC analyst focused on defending systems — learning to
+      monitor, triage alerts, investigate incidents, and turn noisy telemetry
+      into clear answers. I build hands-on labs around SIEM, log analysis,
+      network traffic, phishing analysis, and threat intelligence, and automate
+      the repetitive parts with Python.
+    </p>
+    <p
+      data-intro
+      class="text-muted-foreground mt-5 max-w-[62ch] leading-relaxed"
+    >
+      Recently completed a Master’s in Computer Science. Founder of <a
+        href="https://xsecirc.github.io/"
+        target="_blank"
+        rel="noopener"
+        class="text-foreground decoration-muted-foreground hover:decoration-accent underline underline-offset-4 transition-colors"
+        >xSecIRC</a
+      >, a Discord-based community dedicated to hands-on cybersecurity learning
+      and collaborative skill development.
+    </p>
 
-  <p class="text-muted-foreground text-sm leading-relaxed">
-    Recently completed a Master’s in Computer Science • Founder of <span class="text-foreground font-medium"><Link href="https://xsecirc.github.io/" external underline>xSecIRC</Link></span>,
-    a Discord-based community dedicated to hands-on cybersecurity learning and collaborative skill development.
-  </p>
-
-  <div class="mt-5">
-    <SocialIcons links={HERO_LINKS} />
-  </div>
-</div>
-
-
+    <ul
+      data-intro
+      class="mt-10 flex flex-wrap gap-x-6 gap-y-3 text-[0.95rem]"
+      role="list"
+    >
+      {
+        links.map((l, i) => (
+          <li>
+            <a
+              href={l.href}
+              target={l.external ? '_blank' : undefined}
+              rel={l.external ? 'noopener' : undefined}
+              class:list={[
+                'group link-sweep hover:text-accent inline-flex items-center gap-1',
+                i === 0
+                  ? 'text-foreground font-semibold'
+                  : 'text-muted-foreground',
+              ]}
+            >
+              {l.label}
+              <Icon
+                name={i === 0 ? 'lucide:arrow-down' : 'lucide:arrow-up-right'}
+                class:list={[
+                  'size-3.5 opacity-60 transition-[opacity,translate] duration-300 group-hover:opacity-100',
+                  i === 0
+                    ? 'group-hover:translate-y-0.5'
+                    : 'group-hover:translate-x-0.5 group-hover:-translate-y-0.5',
+                ]}
+              />
+            </a>
+          </li>
+        ))
+      }
+    </ul>
   </section>
-  <section class="flex flex-col gap-y-4">
-    <h2 class="text-2xl font-medium">Latest posts</h2>
-    <ul class="flex flex-col gap-y-4">
+
+  <section class="mt-16 sm:mt-20">
+    <div class="mb-2 flex items-baseline justify-between gap-4" data-reveal>
+      <h2 class="text-xl font-semibold">Writing</h2>
+      <a
+        href="/blog"
+        class="group text-muted-foreground hover:text-accent inline-flex items-center gap-1 text-sm transition-colors"
+        >All writeups <Icon
+          name="lucide:arrow-right"
+          class="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
+        /></a
+      >
+    </div>
+    <ul class="border-b" role="list">
       {
         blog.map((post) => (
-          <li>
+          <li data-reveal>
             <BlogCard entry={post} />
           </li>
         ))
       }
     </ul>
-    <div class="flex justify-center">
-      <Link
-        href="/blog"
-        class={buttonVariants({ variant: 'ghost' }) + ' group'}
+  </section>
+
+  <section class="mt-14 sm:mt-16">
+    <div class="mb-2 flex items-baseline justify-between gap-4" data-reveal>
+      <h2 class="text-xl font-semibold">Projects</h2>
+      <a
+        href="/projects"
+        class="group text-muted-foreground hover:text-accent inline-flex items-center gap-1 text-sm transition-colors"
+        >All projects <Icon
+          name="lucide:arrow-right"
+          class="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5"
+        /></a
       >
-        See all posts <span
-          class="ml-1.5 transition-transform group-hover:translate-x-1"
-          >&rarr;</span
-        >
-      </Link>
     </div>
+    <ul class="border-b" role="list">
+      {
+        projects.map((project) => (
+          <li data-reveal>
+            <ProjectCard project={project} />
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <section class="mt-14 sm:mt-16">
+    <div class="mb-2 flex items-baseline justify-between gap-4" data-reveal>
+      <h2 class="text-xl font-semibold">Certifications</h2>
+      <a
+        href={CREDLY}
+        target="_blank"
+        rel="noopener"
+        class="group text-muted-foreground hover:text-accent inline-flex items-center gap-1 text-sm transition-colors"
+        >Verify on Credly <Icon
+          name="lucide:arrow-up-right"
+          class="size-3.5 transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+        /></a
+      >
+    </div>
+    <ul class="grid border-b sm:grid-cols-2 sm:gap-x-8" role="list">
+      {
+        certifications.map((c) => (
+          <li class="border-t py-4" data-reveal>
+            <p class="font-medium">{c.name}</p>
+            {c.issuer && (
+              <p class="text-muted-foreground mt-0.5 text-sm">{c.issuer}</p>
+            )}
+          </li>
+        ))
+      }
+    </ul>
   </section>
 </Layout>

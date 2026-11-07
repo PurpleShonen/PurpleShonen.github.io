@@ -1,0 +1,143 @@
+---
+// First-visit intro loader + a thin progress bar for client-side navigation.
+// The overlay only exists when the inline head script marks the page as
+// loading (JS on, first visit this session), and never blocks for long.
+---
+
+<div class="site-loader" aria-hidden="true" data-site-loader>
+  <div class="site-loader-inner">
+    <span class="site-loader-name">PurpleShonen</span>
+    <span class="site-loader-track"><span data-loader-bar></span></span>
+  </div>
+</div>
+
+<div class="nav-progress" aria-hidden="true" data-nav-progress transition:persist="nav-progress"></div>
+
+<style is:global>
+  .site-loader {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    place-items: center;
+    background: var(--background);
+  }
+
+  html.is-loading .site-loader {
+    display: grid;
+  }
+
+  .site-loader-inner {
+    display: grid;
+    gap: 0.9rem;
+    justify-items: start;
+  }
+
+  .site-loader-name {
+    font-size: 1.25rem;
+    font-weight: 600;
+    letter-spacing: -0.02em;
+    color: var(--foreground);
+  }
+
+  .site-loader-track {
+    position: relative;
+    display: block;
+    width: 9rem;
+    height: 1px;
+    overflow: hidden;
+    background: var(--border);
+  }
+
+  .site-loader-track > span {
+    position: absolute;
+    inset: 0;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+  }
+
+  .nav-progress {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 90;
+    height: 2px;
+    background: var(--accent);
+    transform: scaleX(0);
+    transform-origin: left;
+    opacity: 0;
+    pointer-events: none;
+  }
+</style>
+
+<script>
+  import { gsap } from 'gsap'
+
+  const root = document.documentElement
+  const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+
+  const done = () => {
+    root.classList.remove('is-loading')
+    document.dispatchEvent(new Event('loader:done'))
+  }
+
+  function runIntro() {
+    const overlay = document.querySelector<HTMLElement>('[data-site-loader]')
+    const bar = document.querySelector<HTMLElement>('[data-loader-bar]')
+    if (!root.classList.contains('is-loading') || !overlay || !bar) {
+      done()
+      return
+    }
+
+    if (reduce) {
+      gsap.to(overlay, { autoAlpha: 0, duration: 0.25, onComplete: done })
+      return
+    }
+
+    const ready = Promise.race([
+      Promise.all([
+        document.fonts?.ready ?? Promise.resolve(),
+        new Promise((r) => setTimeout(r, 650)),
+      ]),
+      new Promise((r) => setTimeout(r, 1600)),
+    ])
+
+    const fill = gsap.to(bar, { scaleX: 0.85, duration: 1.2, ease: 'power2.out' })
+    ready.then(() => {
+      fill.kill()
+      gsap
+        .timeline({ onComplete: done })
+        .to(bar, { scaleX: 1, duration: 0.25, ease: 'power2.out' })
+        .to(overlay, {
+          clipPath: 'inset(0 0 100% 0)',
+          duration: 0.75,
+          ease: 'expo.inOut',
+        })
+        .set(overlay, { autoAlpha: 0, clipPath: 'none' })
+    })
+  }
+
+  runIntro()
+
+  // Thin progress bar while Astro fetches the next page.
+  const nav = () => document.querySelector<HTMLElement>('[data-nav-progress]')
+  let navTween: gsap.core.Tween | null = null
+
+  document.addEventListener('astro:before-preparation', () => {
+    const el = nav()
+    if (!el) return
+    navTween?.kill()
+    gsap.set(el, { scaleX: 0, opacity: 1 })
+    navTween = gsap.to(el, { scaleX: 0.8, duration: 1.4, ease: 'power2.out' })
+  })
+
+  document.addEventListener('astro:after-swap', () => {
+    const el = nav()
+    if (!el) return
+    navTween?.kill()
+    gsap
+      .timeline()
+      .to(el, { scaleX: 1, duration: 0.2, ease: 'power2.out' })
+      .to(el, { opacity: 0, duration: 0.3 }, '+=0.05')
+  })
+</script>

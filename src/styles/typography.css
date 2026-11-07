@@ -34,7 +34,7 @@
     }
 
     :where(h1, h2, h3, h4, h5, h6):not(:where(.not-prose, .not-prose *)) {
-      @apply text-foreground scroll-mt-32 font-medium xl:scroll-mt-20;
+      @apply text-foreground scroll-mt-32 font-semibold xl:scroll-mt-20;
     }
 
     :first-child:not(:where(.not-prose, .not-prose *)) {
@@ -47,11 +47,11 @@
     }
 
     :where(h2):not(:where(.not-prose, .not-prose *)) {
-      @apply mt-8 mb-4 text-2xl;
+      @apply mt-14 mb-4 text-[1.65rem] leading-tight;
     }
 
     :where(h3):not(:where(.not-prose, .not-prose *)) {
-      @apply mt-8 mb-4 text-xl;
+      @apply mt-10 mb-3 text-xl leading-snug;
     }
 
     :where(h4):not(:where(.not-prose, .not-prose *)) {
@@ -63,11 +63,11 @@
     }
 
     :where(a):not(:where(.not-prose, .not-prose *)) {
-      @apply text-foreground decoration-muted-foreground hover:decoration-foreground font-medium break-words underline underline-offset-[3px] transition-colors;
+      @apply text-foreground decoration-muted-foreground hover:text-accent hover:decoration-accent font-medium break-words underline underline-offset-4 transition-colors;
     }
 
     :where(strong):not(:where(.not-prose, .not-prose *)) {
-      @apply text-foreground font-medium;
+      @apply text-foreground font-semibold;
     }
 
     :where(ul):not(:where(.not-prose, .not-prose *)) {
@@ -93,7 +93,7 @@
     }
 
     :where(blockquote):not(:where(.not-prose, .not-prose *)) {
-      @apply [&_*]:text-muted-foreground small my-6 border-l-2 pl-6;
+      @apply [&_*]:text-muted-foreground small border-accent/60 my-8 border-l-2 pl-6;
     }
 
     :where(hr):not(:where(.not-prose, .not-prose *)) {
@@ -125,7 +125,11 @@
     :where(img, video, figure, .expressive-code):not(
         :where(.not-prose, .not-prose *)
       ) {
-      @apply mx-auto my-6;
+      @apply mx-auto my-8;
+    }
+
+    :where(img):not(:where(.not-prose, .not-prose *)) {
+      @apply rounded-md border;
     }
 
     :where(pre):not(:where(.not-prose, .not-prose *)) {

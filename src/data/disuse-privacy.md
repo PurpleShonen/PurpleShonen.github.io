@@ -15,8 +15,7 @@ tap **Scan**, the photo of your page is sent to Google's Gemini, with your own
 Gemini API key, so it can read it. Google may keep those photos and use them to improve its AI, and people at
 Google may review them. So scan notes, not anything private.
 
-Disuse is for adults (18 and over). It is not offered in the European
-Economic Area, the United Kingdom or Switzerland.
+Disuse is for adults (18 and over).
 
 ## What Disuse stores on your phone
 
@@ -126,9 +125,13 @@ over.
 
 ## Where it is available
 
-Disuse is not offered in the European Economic Area, the United Kingdom or
-Switzerland, because the Gemini service Scan uses is not offered there on
-these terms.
+Disuse is offered everywhere Google Play is. Everything except Scan works the
+same in every country, with no key and no connection.
+
+In the European Economic Area, the United Kingdom and Switzerland, Google's
+terms allow only its paid Gemini service, so Scan there needs a key from a
+Google Cloud project with billing turned on. Paid requests are not used to
+improve Google's products (see "Pages you scan" above).
 
 ## Deleting your data
 

@@ -72,6 +72,46 @@
   ::before,
   ::backdrop,
   ::file-selector-button {
-    @apply border-border outline-ring/50 tracking-tight;
+    @apply border-border outline-ring/50;
+  }
+
+  /* Body copy at near-neutral tracking for readability; headings stay tight. */
+  html {
+    letter-spacing: -0.011em;
+    scrollbar-color: color-mix(in srgb, var(--foreground) 22%, transparent)
+      transparent;
+    scrollbar-gutter: stable;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    letter-spacing: -0.025em;
+  }
+
+  ::selection {
+    background-color: color-mix(in srgb, #800080 32%, transparent);
+    color: var(--foreground);
+  }
+
+  input,
+  textarea {
+    caret-color: var(--primary);
+  }
+
+  a:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 3px;
+    border-radius: 0.375rem;
+  }
+
+  code,
+  kbd,
+  samp,
+  pre {
+    letter-spacing: 0;
   }
 }

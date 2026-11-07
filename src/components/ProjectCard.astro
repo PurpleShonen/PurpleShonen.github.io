@@ -14,12 +14,13 @@ const { project } = Astro.props
 ---
 
 <div
-  class="hover:bg-muted/50 rounded-xl border p-4 transition-colors duration-300 ease-in-out"
+  class="group hover:bg-muted/40 hover:border-foreground/15 rounded-xl border transition-colors duration-300 ease-out"
 >
   <Link
-    href={project.data.link ?? ''}
-    class="flex flex-col gap-4 sm:flex-row"
-    external
+    href={project.data.link ?? '/projects'}
+    class="flex flex-col gap-4 rounded-xl p-4 sm:flex-row sm:gap-5"
+    external={Boolean(project.data.link)}
+    rel={project.data.link ? 'noopener' : undefined}
   >
     {
       project.data.image && (
@@ -28,7 +29,9 @@ const { project } = Astro.props
             <img
               src={project.data.image}
               alt={project.data.name}
-              class="object-cover rounded-md max-w-full"
+              width={1200}
+              height={630}
+              class="aspect-[1200/630] w-full rounded-md object-cover"
             />
           ) : (
             <Image
@@ -36,14 +39,14 @@ const { project } = Astro.props
               alt={project.data.name}
               width={1200}
               height={630}
-              class="object-cover rounded-md"
+              class="aspect-[1200/630] w-full rounded-md object-cover"
             />
           )}
         </div>
       )
     }
-    <div class="grow">
-      <h3 class="mb-1 text-lg font-medium">
+    <div class="min-w-0 grow">
+      <h3 class="group-hover:text-primary mb-1 text-lg leading-snug font-medium transition-colors">
         {project.data.name}
       </h3>
       <p class="text-muted-foreground mb-2 text-sm">

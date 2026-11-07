@@ -26,11 +26,11 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
 ---
 
 <div
-  class="hover:bg-muted/50 rounded-xl border p-4 transition-colors duration-300 ease-in-out"
+  class="group hover:bg-muted/40 hover:border-foreground/15 rounded-xl border transition-colors duration-300 ease-out"
 >
   <Link
     href={`/${entry.collection}/${entry.id}`}
-    class="flex flex-col gap-4 sm:flex-row"
+    class="flex flex-col gap-4 rounded-xl p-4 sm:flex-row sm:gap-5"
   >
     {
       entry.data.image && (
@@ -39,7 +39,9 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
             <img
               src={entry.data.image}
               alt={entry.data.title}
-              class="object-cover rounded-md max-w-full"
+              width={1200}
+              height={630}
+              class="aspect-[1200/630] w-full rounded-md object-cover"
             />
           ) : (
             <Image
@@ -47,15 +49,15 @@ const subpostCount = !isSubpost(entry.id) ? await getSubpostCount(entry.id) : 0
               alt={entry.data.title}
               width={1200}
               height={630}
-              class="object-cover rounded-md"
+              class="aspect-[1200/630] w-full rounded-md object-cover"
             />
           )}
         </div>
       )
     }
 
-    <div class="grow">
-      <h3 class="mb-1 text-lg font-medium">{entry.data.title}</h3>
+    <div class="min-w-0 grow">
+      <h3 class="group-hover:text-primary mb-1 text-lg leading-snug font-medium transition-colors">{entry.data.title}</h3>
       <p class="text-muted-foreground mb-2 text-sm">{entry.data.description}</p>
 
       <div
